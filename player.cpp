@@ -25,7 +25,7 @@ void Player::inputUpdate(double deltaTime) {
 		}
 	}
 
-	if (keys[SDL_SCANCODE_S]) {
+	else if (keys[SDL_SCANCODE_S]) {
 		yS = float(jumpForce);
 	}
 
@@ -38,19 +38,26 @@ void Player::inputUpdate(double deltaTime) {
 		xS = float(walkForce);
 		flipped = false;
 	}
-
 	else {
 		xS *= pow(damp, deltaTime);
 	}
 
-	yS += gravity * float(deltaTime);
-
-	if (fabsf(xS) < 50.0f) {
+	if (fabsf(xS) < 5.0f) {
 		xS = 0.0f;
 	}
+	if (fabsf(yS) < 1.0f && jumps > 0) {
+		yS = 0.0f;
+	}
 
+	yS += gravity * float(deltaTime);
 
-	running.animationSpeed = fabsf(xS) / 30.0f;
+	if (jumps == 0) {
+		running.animationSpeed = fabsf(xS) / 100.0f;
+		idle.animationSpeed = fabsf(xS) * 100.0f;
+	}
+	else {
+		running.animationSpeed = fabsf(xS) / 30.0f;
+	}
 
 	if (xS != 0) {
 		texture = running.animate(deltaTime);

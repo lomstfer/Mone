@@ -3,7 +3,7 @@
 
 QuadMech::QuadMech(SDL_Texture* texture, float animation_speed, std::vector<SDL_Texture*> walk_list, float position_x, float position_y, int width, int height, bool centered, float speed, float gravity)
 				 : MovingEntity(texture, position_x, position_y, width, height, centered, 0.0f, 0.0f, speed),
-				   gravity(gravity * 100.0f)
+				   gravity(gravity)
 {
 	direction = rand() % 2;
 	if (direction == 0) {

@@ -1,0 +1,6 @@
+Enemies (not robots)
+Score system
+Weapon upgrades automatic, new color and less shootCooldown
+Background
+Menu
+Music (sound in space? xd), vacuum..

@@ -16,6 +16,7 @@ public:
 
 	std::vector<GroundTile> tiles;
 	std::vector<GroundTile> tilesOnScreen;
+	std::vector<GroundTile> surfaceTilesOnScreen;
 	int tilesOnScreenNumber;
 
 	int spawningArea;

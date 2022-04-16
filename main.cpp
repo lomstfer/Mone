@@ -48,7 +48,7 @@ int main(int argc, char* args[])
 
 	SDL_Texture* playerShoot = IMG_LoadTexture(game.renderer, "assets/player/AShoot.png");
 
-	Player player = Player(playerIdle0, 3.0f, playerIdleList, playerRunList, winW / 2, winH / 2, 16 * 4, 16 * 4, true, 1.0f, 0.005f, 200.0f, 200.0f, 150.0f);
+	Player player = Player(playerIdle0, 3.0f, playerIdleList, playerRunList, winW / 2, winH / 2, 16 * 4, 16 * 4, true, 1.0f, 0.2f, 200.0f, 200.0f, 150.0f);
 	Player::Bullets bullets = Player::Bullets(winW, winH);
 	SDL_Texture* bulletTexture = IMG_LoadTexture(game.renderer, "assets/squares/whitesquare.png");
 	SDL_SetTextureColorMod(bulletTexture, 191, 38, 38);
@@ -107,7 +107,7 @@ int main(int argc, char* args[])
 		
 		game.clear(0, 0, 0);
 
-		camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 5.0f);
+		camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 1.5f);
 
 		player.inputUpdate(deltaTime);
 
@@ -123,10 +123,9 @@ int main(int argc, char* args[])
 
 			int mx, my;
 			SDL_GetMouseState(&mx, &my);
-			Log(std::to_string(mx) + " " + std::to_string(my));
 			if (mx < player.sRect.x)
 				player.flipped = true;
-			if (mx > player.x) {
+			if (mx > player.sRect.x) {
 				player.flipped = false;
 			}
 		}
@@ -141,10 +140,7 @@ int main(int argc, char* args[])
 			}
 		}
 		
-		Log(ground.tilesOnScreenNumber);
-
 		bullets.update(deltaTime);
-
 
 		for (int i = 0; i < ground.tilesOnScreen.size(); ++i) {
 			if (player.groundStop(ground.tilesOnScreen[i].wRect, -15, 0)) {
@@ -169,12 +165,21 @@ int main(int argc, char* args[])
 
 		for (int i = 0; i < mechs.mechsOnScreen.size(); ++i) {
 			if (mechs.mechsOnScreen[i].collideRect(player.wRect, -15, 0)) {
-				if (player.xC < mechs.mechsOnScreen[i].xC) {
-					player.xC = mechs.mechsOnScreen[i].xC - player.w + 15;
+				if (player.xC + player.w + 14 > mechs.mechsOnScreen[i].x && player.xC - 14 < mechs.mechsOnScreen[i].x + mechs.mechsOnScreen[i].w) {
+					player.yC = mechs.mechsOnScreen[i].yC - player.h;
+					player.yS = 0.0f;
+					//player.xS = mechs.mechsOnScreen[i].xS;
+					player.jumps = 1;
 				}
-				if (player.xC > mechs.mechsOnScreen[i].xC) {
-					player.xC = mechs.mechsOnScreen[i].xC + mechs.mechsOnScreen[i].w - 15;
+				else {
+					if (player.xC < mechs.mechsOnScreen[i].xC) {
+						player.xC = mechs.mechsOnScreen[i].x - player.w + 15;
+					}
+					if (player.xC > mechs.mechsOnScreen[i].xC) {
+						player.xC = mechs.mechsOnScreen[i].x + mechs.mechsOnScreen[i].w - 15;
+					}
 				}
+				
 			}
 			for (int o = 0; o < bullets.bullets.size();) {
 				if (bullets.bullets[o].collideRect(mechs.mechsOnScreen[i].wRect, 0, 0)) {
@@ -187,8 +192,6 @@ int main(int argc, char* args[])
 			}
 			mechs.mechsOnScreen[i].rearUpdate(camera.x, camera.y);
 			game.renderFlipped(mechs.mechsOnScreen[i].texture, &mechs.mechsOnScreen[i].sRect, mechs.mechsOnScreen[i].flipped);
-
-			
 		}
 
 		for (int i = 0; i < bullets.bullets.size(); ++i) {

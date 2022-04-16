@@ -39,5 +39,5 @@ void Mechs::update(float camera_x, float camera_y, double deltaTime) {
 }
 
 void Mechs::spawnMech(float position_x, float position_y) {
-	mechs.emplace_back(walkList[0], 10.0f, walkList, position_x, position_y, 44, 40, true, 8.0f, 1.0f);
+	mechs.emplace_back(walkList[0], 10.0f, walkList, position_x, position_y, 44, 40, true, 8.0f, 150.0f);
 }
