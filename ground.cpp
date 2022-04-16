@@ -52,7 +52,7 @@ void Ground::update(float camera_x, float camera_y, double deltaTime) {
 	for (int i = 0; i < tiles.size();) {
 		tiles[i].update(camera_x, camera_y);
 
-		if (tiles[i].onScreenX(winW, 100) && tiles[i].onScreen == false) {
+		if (tiles[i].onScreenX(winW, -100) && tiles[i].onScreen == false) {
 			tiles[i].onScreen = true;
 			tilesOnScreen.push_back(tiles[i]);
 			tiles.erase(tiles.begin() + i);
@@ -87,7 +87,7 @@ void Ground::update(float camera_x, float camera_y, double deltaTime) {
 
 		tilesOnScreenNumber += 1;
 
-		if (tilesOnScreen[i].onScreenX(winW, 100) == false && tilesOnScreen[i].onScreen == true) {
+		if (tilesOnScreen[i].onScreenX(winW, -100) == false && tilesOnScreen[i].onScreen == true) {
 			tilesOnScreen[i].onScreen = false;
 			tiles.push_back(tilesOnScreen[i]);
 			tilesOnScreen.erase(tilesOnScreen.begin() + i);
@@ -98,7 +98,7 @@ void Ground::update(float camera_x, float camera_y, double deltaTime) {
 	}
 
 	// Generate more terrain if not enough is on screen //
-	if (tilesOnScreenNumber < 130 * deep) {
+	if (tilesOnScreenNumber < 6500) {
 		elevationTime += float(deltaTime);
 		if (elevationTime > randomElevationTime) {
 			randomElevationTime = float(rand() % 2) / 10.0f;
@@ -106,17 +106,13 @@ void Ground::update(float camera_x, float camera_y, double deltaTime) {
 		}
 
 		roughNessIncreaser += (float)deltaTime / 20.0f;
-		flatNess -= int(roughNessIncreaser);
+		flatNess -= ftint(roughNessIncreaser);
 
 		if (flatNess <= 3) {
 			flatNess = 3;
 		}
 
 		int randomneg11 = rand() % flatNess;
-
-		/*if (randomneg11 % 2 != 0) {
-			randomneg11 *= -1;
-		}*/
 
 		if (randomneg11 == 2) {
 			randomneg11 = -1;

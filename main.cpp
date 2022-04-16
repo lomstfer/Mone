@@ -141,6 +141,7 @@ int main(int argc, char* args[])
 			}
 		}
 		
+		Log(ground.tilesOnScreenNumber);
 
 		bullets.update(deltaTime);
 
@@ -179,7 +180,6 @@ int main(int argc, char* args[])
 				if (bullets.bullets[o].collideRect(mechs.mechsOnScreen[i].wRect, 0, 0)) {
 					bullets.bullets.erase(bullets.bullets.begin() + o);
 					mechs.mechsOnScreen[i].health -= 1;
-					Log("shot! DDDD");
 				}
 				else {
 					++o;
