@@ -111,8 +111,11 @@ int main(int argc, char* args[])
 
 	int score = 0;
 	Text scoreText("score: " + std::to_string(score), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 10, false, game.renderer);
-	Text testText("score: " + std::to_string(score), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 300, false, game.renderer);
+	Text testText("fps: " + std::to_string(score), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 300, false, game.renderer);
 	int fpsInt = 0;
+
+	int highScore = score;
+	Text highScoreText = Text("highscore: " + std::to_string(highScore), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 50, false, game.renderer);
 
 	Uint64 nowTime = SDL_GetPerformanceCounter();
 	Uint64 lastTime = 0;
@@ -125,6 +128,7 @@ int main(int argc, char* args[])
 
 	bool mousePressed = false;
 	float shootCooldown = 0;
+	float reloadTime = 1.0f;
 	bool shootTrue = false;
 	float shootTextureTime = 0;
 
@@ -199,7 +203,7 @@ int main(int argc, char* args[])
 		
 			game.clear(0, 0, 0);
 
-			camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 2.0f);
+			camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 10.0f);
 
 			player.inputUpdate(deltaTime);
 
@@ -207,8 +211,17 @@ int main(int argc, char* args[])
 
 			ground.update(camera.x, camera.y, deltaTime);
 
+			for (int i = 0; i < stars.size(); ++i) {
+				stars[i].x -= 10.0f * float(deltaTime);
+				stars[i].update(0, 0);
+				if (stars[i].x < -10) {
+					stars[i].x = winW + 10;
+				}
+				game.render(stars[i].texture, &stars[i].sRect);
+			}
+
 			shootCooldown += deltaTime;
-			if (mousePressed && shootCooldown > 0.2f) {
+			if (mousePressed && shootCooldown > 1.0f) {
 				bullets.spawnBullet(bulletTexture, player.x + player.w / 2, player.y + 45, 3, 20, 1000.0f, camera.x, camera.y);
 				shootCooldown = 0.0f;
 				shootTrue = true;
@@ -240,17 +253,8 @@ int main(int argc, char* args[])
 					shootTrue = false;
 				}
 			}
-
-			for (int i = 0; i < stars.size(); ++i) {
-				stars[i].x -= 10.0f * float(deltaTime);
-				stars[i].update(0, 0);
-				if (stars[i].x < -10) {
-					stars[i].x = winW + 10;
-				}
-				game.render(stars[i].texture, &stars[i].sRect);
-			}
 		
-			bullets.update(deltaTime);
+			bullets.update(camera.x, camera.y, deltaTime);
 
 			for (int i = 0; i < ground.tilesOnScreen.size(); ++i) {
 				if (player.groundStop(ground.tilesOnScreen[i].wRect, -15, 0)) {
@@ -275,15 +279,15 @@ int main(int argc, char* args[])
 
 			if (fabsf(player.xS) > 0) {
 				spawnMechTime += float(deltaTime);
-				spawnMechIncreaser += float(deltaTime) / 10.0f;
+				spawnMechIncreaser += float(deltaTime) / 20.0f;
 			
 				if (spawnMechTime > spawnMechRandomTime && mechs.mechs.size() < 40) {
 				
 					if (player.x < winW / 2) {
-						mechs.spawnMech(ground.recordLowX - rand() % 50 + 50, player.y);
+						mechs.spawnMech(ground.recordLowX /*- rand() % 50 + 50*/, player.y);
 					}
 					if (player.x > winW / 2) {
-						mechs.spawnMech(ground.recordHighX + rand() % 50 + 50, player.y);
+						mechs.spawnMech(ground.recordHighX /*+ rand() % 50 + 50*/, player.y);
 					}
 				
 					spawnMechTime = 0;
@@ -338,12 +342,31 @@ int main(int argc, char* args[])
 				}
 			}
 
-			score < 10 ? SDL_SetTextureColorMod(bulletTexture, 191, 38, 38) :
-			score >= 10 && score < 20 ? SDL_SetTextureColorMod(bulletTexture, 67, 235, 52) :
-			score >= 20 && score < 30 ? SDL_SetTextureColorMod(bulletTexture, 52, 186, 235) :
-			score >= 30 && score < 40 ? SDL_SetTextureColorMod(bulletTexture, 211, 52, 235) :
-			score >= 40 && score < 50 ? SDL_SetTextureColorMod(bulletTexture, 255, 255, 255) :
-			SDL_SetTextureColorMod(bulletTexture, 227, 163, 25);
+			Log(ground.tiles.size());
+
+			if (score < 20) {
+				SDL_SetTextureColorMod(bulletTexture, 191, 38, 38);
+			}
+			if (score >= 20) {
+				SDL_SetTextureColorMod(bulletTexture, 67, 235, 52);
+				reloadTime = 0.9f;
+				if (score >= 40) {
+					SDL_SetTextureColorMod(bulletTexture, 52, 186, 235);
+					reloadTime = 0.8f;
+					if (score >= 60) {
+						SDL_SetTextureColorMod(bulletTexture, 211, 52, 235);
+						reloadTime = 0.7f;
+						if (score >= 80) {
+							SDL_SetTextureColorMod(bulletTexture, 255, 255, 255);
+							reloadTime = 0.6f;
+							if (score >= 100) {
+								SDL_SetTextureColorMod(bulletTexture, 227, 163, 25);
+								reloadTime = 0.5f;
+							}
+						}
+					}
+				}
+			}
 
 			player.rearUpdate(camera.x, camera.y);
 		
@@ -351,10 +374,17 @@ int main(int argc, char* args[])
 
 			game.render(healthBar.texture, &healthBar.rect);
 			game.render(healthText.texture, &healthText.rect);
-
+			
 			scoreText.text = "score: " + std::to_string(score);
 			scoreText.update();
 			game.render(scoreText.texture, &scoreText.rect);
+
+			if (score >= highScore) {
+				highScore = score;
+			}
+			highScoreText.update();
+			highScoreText.text = "highscore: " + std::to_string(highScore);
+			game.render(highScoreText.texture, &highScoreText.rect);
 
 			testText.text = "fps: " + std::to_string(ftint(1.0f / float(deltaTime)));
 			fpsInt += 1;
@@ -392,6 +422,11 @@ int main(int argc, char* args[])
 				camera.y = 0;
 				player.texture = player.idle.textureList[0];
 				healthBar.rect.w = 180;
+				score = 0;
+				ground.recordHighX = winW / 2 + ground.spawningArea / 2 * (ground.scale + ground.gap);
+				ground.makeMoreGroundRight = true;
+				ground.recordLowX = winW / 2 - ground.spawningArea / 2 * (ground.scale + ground.gap);
+				ground.makeMoreGroundLeft = true;
 				player.rearUpdate(camera.x, camera.y);
 				ground.generateSpawn();
 			}

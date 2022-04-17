@@ -89,12 +89,13 @@ Player::Bullets::Bullets(int window_width, int window_height)
 
 }
 
-void Player::Bullets::update(double deltaTime) {
+void Player::Bullets::update(float camera_x, float camera_y, double deltaTime) {
 	for (int i = 0; i < bullets.size(); ++i) {
 		bullets[i].yS += float(deltaTime) / 30.0f;
 		bullets[i].rotation = atan2(bullets[i].xS, -bullets[i].yS) * 180 / M_PI;
 
 		bullets[i].moveUpdate(deltaTime);
+		bullets[i].rearUpdate(camera_x, camera_y);
 	}
 }
 

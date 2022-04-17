@@ -36,9 +36,6 @@ public:
 	int elevationRight;
 	int elevationLeft;
 
-	float lowestY;
-	float lowyX;
-
 	int flatNess;
 	float roughNessIncreaser;
 

@@ -29,10 +29,9 @@ public:
 	class Bullets {
 	public:
 		Bullets(int window_width, int window_height);
-		void update(double deltaTime);
+		void update(float camera_x, float camera_y, double deltaTime);
 
 		std::vector<Bullet> bullets;
-		std::vector<Bullet> bulletsOnScreen;
 
 		int winW;
 		int winH;
