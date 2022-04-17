@@ -373,11 +373,12 @@ int main(int argc, char* args[])
 			game.renderFlipped(player.texture, &player.sRect, player.flipped);
 
 			game.render(healthBar.texture, &healthBar.rect);
-			game.render(healthText.texture, &healthText.rect);
+
+			healthText.update();
 			
 			scoreText.text = "score: " + std::to_string(score);
 			scoreText.update();
-			game.render(scoreText.texture, &scoreText.rect);
+			//game.render(scoreText.texture, &scoreText.rect);
 
 			if (score >= highScore) {
 				highScore = score;
@@ -391,8 +392,7 @@ int main(int argc, char* args[])
 			if (fpsInt % 5 == 0) {
 				testText.update();
 			}
-			game.render(testText.texture, &testText.rect);
-
+			//game.render(testText.texture, &testText.rect);
 			game.present();
 		}
 		while (dead) {
