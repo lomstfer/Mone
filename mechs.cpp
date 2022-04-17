@@ -5,13 +5,13 @@ Mechs::Mechs(int window_width, int window_height, std::vector<SDL_Texture*> walk
 	       : winW(window_width), winH(window_height), walkList(walk_list) {
 }
 
-void Mechs::update(float player_x, float player_y, float camera_x, float camera_y, double deltaTime) {
+void Mechs::update(float player_x, float player_y, float player_width, float player_height, float camera_x, float camera_y, double deltaTime) {
 	// Iteration: update and get the new record //
 	for (int i = 0; i < mechs.size();) {
 		mechs[i].update(camera_x, camera_y);
 
-		if (mechs[i].onScreenX(winW, 100) && mechs[i].onScreen == false) {
-			mechs[i].onScreen = true;
+		if (mechs[i].onScreen(winW, winH, 100) && mechs[i].onScreenCheck == false) {
+			mechs[i].onScreenCheck = true;
 			mechsOnScreen.push_back(mechs[i]);
 			mechs.erase(mechs.begin() + i);
 		}
@@ -22,10 +22,10 @@ void Mechs::update(float player_x, float player_y, float camera_x, float camera_
 	}
 
 	for (int i = 0; i < mechsOnScreen.size();) {
-		mechsOnScreen[i].patrolUpdate(deltaTime, player_x, player_y);
+		mechsOnScreen[i].patrolUpdate(deltaTime, player_x, player_y, player_width, player_height);
 
-		if (mechsOnScreen[i].onScreenX(winW, 100) == false && mechsOnScreen[i].onScreen == true) {
-			mechsOnScreen[i].onScreen = false;
+		if (mechsOnScreen[i].onScreen(winW, winH, 100) == false && mechsOnScreen[i].onScreenCheck == true) {
+			mechsOnScreen[i].onScreenCheck = false;
 			mechs.push_back(mechsOnScreen[i]);
 			mechsOnScreen.erase(mechsOnScreen.begin() + i);
 		}
@@ -36,6 +36,7 @@ void Mechs::update(float player_x, float player_y, float camera_x, float camera_
 			++i;
 		}
 	}
+
 }
 
 void Mechs::spawnMech(float position_x, float position_y) {

@@ -13,6 +13,7 @@
 #include "Ground.hpp"
 #include "Mechs.hpp"
 #include "Text.hpp"
+#include "ScreenObject.h"
 
 #define Log(x) std::cout << x << std::endl;
 
@@ -53,6 +54,13 @@ int main(int argc, char* args[])
 	Player::Bullets bullets = Player::Bullets(winW, winH);
 	SDL_Texture* bulletTexture = IMG_LoadTexture(game.renderer, "assets/squares/whitesquare.png");
 	SDL_SetTextureColorMod(bulletTexture, 191, 38, 38);
+
+	SDL_Texture* healthBarTexture = IMG_LoadTexture(game.renderer, "assets/squares/whitesquare.png");
+	SDL_SetTextureColorMod(healthBarTexture, 191, 38, 38);
+	ScreenObject healthBar = ScreenObject(healthBarTexture, winW - 190, 10, 180, 50, false);
+
+	Text healthText = Text("HEALTH: ", 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", healthBar.rect.x - 180, healthBar.rect.y + 3, false, game.renderer);
+
 #pragma endregion PLAYER
 
 #pragma region
@@ -66,6 +74,11 @@ int main(int argc, char* args[])
 
 	Mechs mechs = Mechs(winW, winH, mechWalkList);
 
+	float spawnMechTime = 0;
+	float spawnMechRandomTime = rand() % 5 + 3;
+	if (spawnMechRandomTime == 0) {
+		spawnMechRandomTime = 2;
+	}
 	float spawnMechIncreaser = 0;
 
 #pragma endregion QUADMECH
@@ -77,6 +90,8 @@ int main(int argc, char* args[])
 
 	int score = 0;
 	Text scoreText("score: " + std::to_string(score), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 10, false, game.renderer);
+	Text testText("score: " + std::to_string(score), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 300, false, game.renderer);
+	int fpsInt = 0;
 
 	Uint64 nowTime = SDL_GetPerformanceCounter();
 	Uint64 lastTime = 0;
@@ -92,7 +107,11 @@ int main(int argc, char* args[])
 	bool shootTrue = false;
 	float shootTextureTime = 0;
 
+	bool menu = true;
+	bool playing = true;
+
 	while (game.running) {
+		while (playing) {
 		lastTime = nowTime;
 		nowTime = SDL_GetPerformanceCounter();
 		deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
@@ -109,11 +128,11 @@ int main(int argc, char* args[])
 		
 		game.clear(0, 0, 0);
 
-		camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 1.5f);
+		camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 10.0f);
 
 		player.inputUpdate(deltaTime);
 
-		mechs.update(player.x + player.w / 2, player.y + player.w / 2, camera.x, camera.y, deltaTime);
+		mechs.update(player.x, player.y, player.w, player.h, camera.x, camera.y, deltaTime);
 
 		ground.update(camera.x, camera.y, deltaTime);
 
@@ -142,6 +161,7 @@ int main(int argc, char* args[])
 			}
 		}
 		
+		Log(ground.tiles.size());
 		bullets.update(deltaTime);
 
 		for (int i = 0; i < ground.tilesOnScreen.size(); ++i) {
@@ -166,36 +186,43 @@ int main(int argc, char* args[])
 		}
 
 		if (fabsf(player.xS) > 0) {
-			spawnMechIncreaser += deltaTime;
-			if (spawnMechIncreaser > ftint(2.0f / float(deltaTime))) {
-				if (player.xS < 0) {
-					if (rand() % ftint(2.0f / float(deltaTime) - spawnMechIncreaser) == 0)
-						mechs.spawnMech(ground.recordLowX - 100, player.y);
+			spawnMechTime += float(deltaTime);
+			spawnMechIncreaser += float(deltaTime) / 10.0f;
+			
+			if (spawnMechTime > spawnMechRandomTime && mechs.mechs.size() < 20) {
+				
+				if (player.x < winW / 2) {
+					mechs.spawnMech(ground.recordLowX - rand() % 50 + 50, player.y);
 				}
-				if (player.xS > 0) {
-					if (rand() % ftint(2.0f / float(deltaTime) - spawnMechIncreaser) == 0)
-						mechs.spawnMech(ground.recordHighX + 100, player.y);
+				if (player.x > winW / 2) {
+					mechs.spawnMech(ground.recordHighX + rand() % 50 + 50, player.y);
 				}
+				
+				spawnMechTime = 0;
+				if (spawnMechIncreaser > 4.8f) {
+					spawnMechIncreaser = 4.8f;
+				}
+				spawnMechRandomTime = (rand() % 10 + 50) / 10.0f - spawnMechIncreaser;
 			}
 		}
-		
 
 		for (int i = 0; i < mechs.mechsOnScreen.size(); ++i) {
 			if (mechs.mechsOnScreen[i].collideRect(player.wRect, -15, 0)) {
-				if (player.xC + player.w + 14 > mechs.mechsOnScreen[i].x && player.xC - 14 < mechs.mechsOnScreen[i].x + mechs.mechsOnScreen[i].w) {
+				/*if (player.xC + player.w + 14 > mechs.mechsOnScreen[i].x && player.xC - 14 < mechs.mechsOnScreen[i].x + mechs.mechsOnScreen[i].w) {
 					player.yC = mechs.mechsOnScreen[i].yC - player.h;
 					player.yS = 0.0f;
-					//player.xS = mechs.mechsOnScreen[i].xS;
 					player.jumps = 1;
 				}
-				else {
+				else {*/
 					if (player.xC < mechs.mechsOnScreen[i].xC) {
-						player.xC = mechs.mechsOnScreen[i].x - player.w + 15;
+						mechs.mechsOnScreen[i].xS = 30;
+						healthBar.rect.w -= 10;
 					}
-					if (player.xC > mechs.mechsOnScreen[i].xC) {
-						player.xC = mechs.mechsOnScreen[i].x + mechs.mechsOnScreen[i].w - 15;
+					else if (player.xC > mechs.mechsOnScreen[i].xC) {
+						mechs.mechsOnScreen[i].xS = -30;
+						healthBar.rect.w -= 10;
 					}
-				}
+				/*}*/
 				
 			}
 			for (int o = 0; o < bullets.bullets.size();) {
@@ -221,15 +248,32 @@ int main(int argc, char* args[])
 			}
 		}
 
+		score < 10 ? SDL_SetTextureColorMod(bulletTexture, 191, 38, 38) :
+		score >= 10 && score < 20 ? SDL_SetTextureColorMod(bulletTexture, 67, 235, 52) :
+		score >= 20 && score < 30 ? SDL_SetTextureColorMod(bulletTexture, 52, 186, 235) :
+		score >= 30 && score < 40 ? SDL_SetTextureColorMod(bulletTexture, 211, 52, 235) :
+		SDL_SetTextureColorMod(bulletTexture, 255, 255, 255);
+
 		player.rearUpdate(camera.x, camera.y);
 		
 		game.renderFlipped(player.texture, &player.sRect, player.flipped);
+
+		game.render(healthBar.texture, &healthBar.rect);
+		game.render(healthText.texture, &healthText.rect);
 
 		scoreText.text = "score: " + std::to_string(score);
 		scoreText.update();
 		game.render(scoreText.texture, &scoreText.rect);
 
+		testText.text = "fps: " + std::to_string(ftint(1.0f / float(deltaTime)));
+		fpsInt += 1;
+		if (fpsInt % 5 == 0)
+			testText.update();
+		game.render(testText.texture, &testText.rect);
+
 		game.present();
+		}
+
 	}
 
 	game.quit();

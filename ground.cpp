@@ -18,10 +18,10 @@ Ground::Ground(int window_width, int window_height, SDL_Texture* stone_texture)
 	gap = 1;
 
 	recordHighX = winW / 2 + spawningArea / 2 * (scale + gap);
-	makeMoreGroundRight = false;
+	makeMoreGroundRight = true;
 
 	recordLowX = winW / 2 - spawningArea / 2 * (scale + gap);
-	makeMoreGroundLeft = false;
+	makeMoreGroundLeft = true;
 
 	elevationTime = 0;
 	randomElevationTime = 0;
@@ -57,7 +57,7 @@ void Ground::update(float camera_x, float camera_y, double deltaTime) {
 	for (int i = 0; i < tiles.size(); ++i) {
 		tiles[i].update(camera_x, camera_y);
 
-		if (tiles[i].onScreenX(winW, 0) && tiles[i].onScreen == false) {
+		if (tiles[i].onScreenX(winW, 100) && tiles[i].onScreen == false) {
 			tiles[i].onScreen = true;
 			tilesOnScreen.push_back(tiles[i]);
 		}
@@ -88,7 +88,7 @@ void Ground::update(float camera_x, float camera_y, double deltaTime) {
 
 		tilesOnScreenNumber += 1;
 
-		if (tilesOnScreen[i].onScreenX(winW, 0) == false && tilesOnScreen[i].onScreen == true) {
+		if (tilesOnScreen[i].onScreenX(winW, 100) == false && tilesOnScreen[i].onScreen == true) {
 			tilesOnScreen[i].onScreen = false;
 			tiles.push_back(tilesOnScreen[i]);
 			tilesOnScreen.erase(tilesOnScreen.begin() + i);
@@ -99,7 +99,7 @@ void Ground::update(float camera_x, float camera_y, double deltaTime) {
 	}
 
 	// Generate more terrain if not enough is on screen //
-	if (tilesOnScreenNumber < winW / (scale + gap) * deep) {
+	if (tilesOnScreenNumber < (winW + 200) / (scale + gap) * deep) {
 		elevationTime += float(deltaTime);
 		if (elevationTime > randomElevationTime) {
 			randomElevationTime = float(rand() % 2) / 10.0f;

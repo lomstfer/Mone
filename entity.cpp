@@ -14,11 +14,6 @@ Entity::Entity(SDL_Texture* texture, float position_x, float position_y, int wid
 	}
 
 	wRect = XYWH(x, y, w, h);
-
-	/*sRect.x = ftint(x);
-	sRect.y = ftint(y);
-	sRect.w = ftint(w);
-	sRect.h = ftint(h);*/
 }
 
 void Entity::update(float camera_x, float camera_y) {

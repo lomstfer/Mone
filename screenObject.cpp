@@ -1,0 +1,10 @@
+#include "ScreenObject.h"
+
+ScreenObject::ScreenObject(SDL_Texture* texture, int position_x, int position_y, int width, int height, bool centered)
+			: texture(texture) {
+	rect = { position_x,position_y, width, height };
+	if (centered) {
+		rect.x -= rect.w / 2;
+		rect.y -= rect.h / 2;
+	}
+}

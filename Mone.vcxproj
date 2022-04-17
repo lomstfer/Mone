@@ -155,6 +155,7 @@
     <ClCompile Include="movingEntity.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="quadmech.cpp" />
+    <ClCompile Include="screenObject.cpp" />
     <ClCompile Include="text.cpp" />
     <ClCompile Include="xywh.cpp" />
   </ItemGroup>
@@ -171,6 +172,7 @@
     <ClInclude Include="MovingEntity.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="QuadMech.hpp" />
+    <ClInclude Include="ScreenObject.h" />
     <ClInclude Include="Text.hpp" />
     <ClInclude Include="XYWH.h" />
   </ItemGroup>
