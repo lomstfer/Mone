@@ -155,6 +155,7 @@
     <ClCompile Include="movingEntity.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="quadmech.cpp" />
+    <ClCompile Include="text.cpp" />
     <ClCompile Include="xywh.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,7 +171,11 @@
     <ClInclude Include="MovingEntity.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="QuadMech.hpp" />
+    <ClInclude Include="Text.hpp" />
     <ClInclude Include="XYWH.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

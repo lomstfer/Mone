@@ -14,6 +14,6 @@ public:
 	int winW;
 	int winH;
 
-	void update(float camera_x, float camera_y, double deltaTime);
+	void update(float player_x, float player_y, float camera_x, float camera_y, double deltaTime);
 	void spawnMech(float position_x, float position_y);
 };

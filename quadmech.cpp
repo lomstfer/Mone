@@ -21,8 +21,7 @@ QuadMech::QuadMech(SDL_Texture* texture, float animation_speed, std::vector<SDL_
 	health = 3;
 }
 
-void QuadMech::patrolUpdate(double deltaTime) {
-	
+void QuadMech::patrolUpdate(double deltaTime, float player_x, float player_y) {
 	texture = walk.animate(deltaTime);
 
 	yS += gravity * float(deltaTime);
@@ -56,6 +55,26 @@ void QuadMech::patrolUpdate(double deltaTime) {
 
 	if (xS < -speedLimit) {
 		xS = -speedLimit;
+	}
+
+	// Distance to the player calculations, pythagoras
+	float pxD = x - player_x;
+	float pyD = y - player_y;
+	float pD = sqrt(pow(pxD, 2) + pow(pyD, 2));
+
+
+	if (pD < 500 && pD > 50) {
+		if (pxD < 0) {
+			if (xS < 0) {
+				xS *= -1;
+			}
+		}
+
+		if (pxD > 0) {
+			if (xS > 0) {
+				xS *= -1;
+			}
+		}
 	}
 
 	walk.animationSpeed = fabsf(xS * speed) / 10.0f;

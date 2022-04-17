@@ -12,6 +12,7 @@
 #include "QuadMech.hpp"
 #include "Ground.hpp"
 #include "Mechs.hpp"
+#include "Text.hpp"
 
 #define Log(x) std::cout << x << std::endl;
 
@@ -63,9 +64,10 @@ int main(int argc, char* args[])
 	SDL_Texture* mech5 = IMG_LoadTexture(game.renderer, "assets/quadleggedmechspider/walking/mech5.png");
 	std::vector<SDL_Texture*> mechWalkList = { mech0, mech1, mech2, mech3, mech4, mech5 };
 
-	/*for (int i = 0; i < 10; ++i) {
-		quadMechs.emplace_back(mech0, mechWalk, player.x + i * 200, player.y, 44, 40, true, 6.0f, 20.0f);
-	}*/
+	Mechs mechs = Mechs(winW, winH, mechWalkList);
+
+	float spawnMechIncreaser = 0;
+
 #pragma endregion QUADMECH
 
 	SDL_Texture* stoneTexture = IMG_LoadTexture(game.renderer, "assets/squares/stonesquare.png");
@@ -73,7 +75,8 @@ int main(int argc, char* args[])
 	Ground ground = Ground(winW, winH, stoneTexture);
 	ground.generateSpawn();
 
-	Mechs mechs = Mechs(winW, winH, mechWalkList);
+	int score = 0;
+	Text scoreText("score: " + std::to_string(score), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 10, false, game.renderer);
 
 	Uint64 nowTime = SDL_GetPerformanceCounter();
 	Uint64 lastTime = 0;
@@ -94,7 +97,6 @@ int main(int argc, char* args[])
 		nowTime = SDL_GetPerformanceCounter();
 		deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
 
-
 		game.events(pause, mousePressed);
 
 		if (pause) {
@@ -111,7 +113,7 @@ int main(int argc, char* args[])
 
 		player.inputUpdate(deltaTime);
 
-		mechs.update(camera.x, camera.y, deltaTime);
+		mechs.update(player.x + player.w / 2, player.y + player.w / 2, camera.x, camera.y, deltaTime);
 
 		ground.update(camera.x, camera.y, deltaTime);
 
@@ -151,17 +153,32 @@ int main(int argc, char* args[])
 				mechs.mechsOnScreen[g].groundStop(ground.tilesOnScreen[i].wRect, 0, 0);
 			}
 
+			for (int o = 0; o < bullets.bullets.size();) {
+				if (bullets.bullets[o].collideRect(ground.tilesOnScreen[i].wRect, 0, 0)) {
+					bullets.bullets.erase(bullets.bullets.begin() + o);
+				}
+				else {
+					++o;
+				}
+			}
+
 			game.render(ground.tilesOnScreen[i].texture, &ground.tilesOnScreen[i].sRect);
 		}
 
-		if (player.xS < 0) {
-			if (rand() % ftint(2.0f / float(deltaTime)) == 0)
-				mechs.spawnMech(ground.recordLowX - 100, player.y);
+		if (fabsf(player.xS) > 0) {
+			spawnMechIncreaser += deltaTime;
+			if (spawnMechIncreaser > ftint(2.0f / float(deltaTime))) {
+				if (player.xS < 0) {
+					if (rand() % ftint(2.0f / float(deltaTime) - spawnMechIncreaser) == 0)
+						mechs.spawnMech(ground.recordLowX - 100, player.y);
+				}
+				if (player.xS > 0) {
+					if (rand() % ftint(2.0f / float(deltaTime) - spawnMechIncreaser) == 0)
+						mechs.spawnMech(ground.recordHighX + 100, player.y);
+				}
+			}
 		}
-		if (player.xS > 0) {
-			if (rand() % ftint(2.0f / float(deltaTime)) == 0)
-				mechs.spawnMech(ground.recordHighX + 100, player.y);
-		}
+		
 
 		for (int i = 0; i < mechs.mechsOnScreen.size(); ++i) {
 			if (mechs.mechsOnScreen[i].collideRect(player.wRect, -15, 0)) {
@@ -185,6 +202,9 @@ int main(int argc, char* args[])
 				if (bullets.bullets[o].collideRect(mechs.mechsOnScreen[i].wRect, 0, 0)) {
 					bullets.bullets.erase(bullets.bullets.begin() + o);
 					mechs.mechsOnScreen[i].health -= 1;
+					if (mechs.mechsOnScreen[i].health <= 0) {
+						score += 1;
+					}
 				}
 				else {
 					++o;
@@ -204,6 +224,10 @@ int main(int argc, char* args[])
 		player.rearUpdate(camera.x, camera.y);
 		
 		game.renderFlipped(player.texture, &player.sRect, player.flipped);
+
+		scoreText.text = "score: " + std::to_string(score);
+		scoreText.update();
+		game.render(scoreText.texture, &scoreText.rect);
 
 		game.present();
 	}

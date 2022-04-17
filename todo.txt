@@ -1,6 +1,7 @@
-Enemies (not robots)
 Score system
+Enemies (not robots)
 Weapon upgrades automatic, new color and less shootCooldown
 Background
 Menu
 Music (sound in space? xd), vacuum..
+Better mechanics maybe, mouse sometimes buggy
