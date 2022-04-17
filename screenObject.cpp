@@ -8,3 +8,11 @@ ScreenObject::ScreenObject(SDL_Texture* texture, int position_x, int position_y,
 		rect.y -= rect.h / 2;
 	}
 }
+
+bool ScreenObject::collidePoint(int x, int y){
+	if (x > rect.x && x < rect.x + rect.w &&
+		y > rect.y && y < rect.y + rect.h) {
+		return true;
+	}
+	return false;
+}

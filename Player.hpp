@@ -15,6 +15,7 @@ public:
 	float gravity;
 	float walkForce;
 	float damp;
+	float speedLimit;
 
 	AnimatedSprite idle;
 	AnimatedSprite running;

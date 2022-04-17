@@ -46,7 +46,7 @@ void Game::events(bool &pause, bool &mouse_pressed) {
 			pause = !pause;
 			break;
 		}
-		if (event.type == SDL_MOUSEBUTTONDOWN) {
+		if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
 			mouse_pressed = true;
 		}
 		else {

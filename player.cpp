@@ -14,6 +14,8 @@ Player::Player(SDL_Texture* texture, float animation_speed, std::vector<SDL_Text
 
 	colliderUpdater = 0;
 	time = 0;
+
+	speedLimit = 200.0f;
 }
 
 void Player::inputUpdate(double deltaTime) {
@@ -30,16 +32,25 @@ void Player::inputUpdate(double deltaTime) {
 	}
 
 	if (keys[SDL_SCANCODE_A]) {
-		xS = -float(walkForce);
+		xS += -float(walkForce) * float(deltaTime);
 		flipped = true;
 	}
 
 	else if (keys[SDL_SCANCODE_D]) {
-		xS = float(walkForce);
+		xS += float(walkForce) * float(deltaTime);
 		flipped = false;
 	}
 	else {
 		xS *= pow(damp, deltaTime);
+	}
+
+	if (fabsf(xS) > speedLimit) {
+		if (xS < 0) {
+			xS = -speedLimit;
+		}
+		if (xS > 0) {
+			xS = speedLimit;
+		}
 	}
 
 	if (fabsf(xS) < 5.0f) {
@@ -54,9 +65,11 @@ void Player::inputUpdate(double deltaTime) {
 	if (jumps == 0) {
 		running.animationSpeed = fabsf(xS) / 100.0f;
 		idle.animationSpeed = fabsf(xS) * 100.0f;
+		speedLimit = 400.0f;
 	}
 	else {
 		running.animationSpeed = fabsf(xS) / 30.0f;
+		speedLimit = 200.0f;
 	}
 
 	if (xS != 0) {
@@ -82,7 +95,7 @@ Player::Bullets::Bullets(int window_width, int window_height)
 
 void Player::Bullets::update(double deltaTime) {
 	for (int i = 0; i < bullets.size(); ++i) {
-		bullets[i].yS += float(deltaTime) / 10.0f;
+		bullets[i].yS += float(deltaTime) / 30.0f;
 		bullets[i].rotation = atan2(bullets[i].xS, -bullets[i].yS) * 180 / M_PI;
 
 		bullets[i].moveUpdate(deltaTime);

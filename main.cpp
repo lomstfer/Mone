@@ -24,6 +24,21 @@ int main(int argc, char* args[])
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 	Game game = Game("Illre", winW, winH);
 
+	SDL_Texture* starTexture = IMG_LoadTexture(game.renderer, "assets/squares/whitesquare.png");
+	std::vector<Entity> stars;
+	for (int i = 0; i < 100; ++i) {
+		stars.emplace_back(starTexture, rand() % winW, rand() % winH, 2, 2, false);
+	}
+
+	SDL_Texture* moneBgTexture = IMG_LoadTexture(game.renderer, "assets/moneMBg.png");
+	ScreenObject moneBg = ScreenObject(moneBgTexture, 0, 0, winW, winH, false);
+
+	SDL_Texture* startButtonTexture = IMG_LoadTexture(game.renderer, "assets/startbutton.png");
+	ScreenObject startButton = ScreenObject(startButtonTexture, winW * 0.3927, 300, 21 * 7, 10 * 7, false);
+
+	SDL_Texture* exitButtonTexture = IMG_LoadTexture(game.renderer, "assets/exitbutton.png");
+	ScreenObject exitButton = ScreenObject(exitButtonTexture, winW * 0.3927 + 21 * 7 / 2, 420, 18 * 5, 10 * 5, true);
+
 	Camera camera(0.0f, 0.0f);
 
 #pragma region
@@ -50,7 +65,7 @@ int main(int argc, char* args[])
 
 	SDL_Texture* playerShoot = IMG_LoadTexture(game.renderer, "assets/player/AShoot.png");
 
-	Player player = Player(playerIdle0, 3.0f, playerIdleList, playerRunList, winW / 2, winH / 2, 16 * 4, 16 * 4, true, 1.0f, 0.2f, 200.0f, 200.0f, 150.0f);
+	Player player = Player(playerIdle0, 3.0f, playerIdleList, playerRunList, winW / 2, winH / 2, 16 * 5, 16 * 5, true, 1.0f, 0.2f, 300.0f, 200.0f, 150.0f);
 	Player::Bullets bullets = Player::Bullets(winW, winH);
 	SDL_Texture* bulletTexture = IMG_LoadTexture(game.renderer, "assets/squares/whitesquare.png");
 	SDL_SetTextureColorMod(bulletTexture, 191, 38, 38);
@@ -88,6 +103,12 @@ int main(int argc, char* args[])
 	Ground ground = Ground(winW, winH, stoneTexture);
 	ground.generateSpawn();
 
+	SDL_Texture* dieTexture = IMG_LoadTexture(game.renderer, "assets/squares/stonesquare.png");
+	SDL_SetTextureColorMod(dieTexture, 0, 0, 0);
+	float dieTextureAlpha = 0.0f;
+	SDL_SetTextureAlphaMod(dieTexture, dieTextureAlpha);
+	SDL_Rect dieTextureRect = { 0, 0, winW, winH };
+
 	int score = 0;
 	Text scoreText("score: " + std::to_string(score), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 10, false, game.renderer);
 	Text testText("score: " + std::to_string(score), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 300, false, game.renderer);
@@ -108,165 +129,258 @@ int main(int argc, char* args[])
 	float shootTextureTime = 0;
 
 	bool menu = true;
-	bool playing = true;
+	bool playing = false;
+	bool dead = false;
 
 	while (game.running) {
-		while (playing) {
-		lastTime = nowTime;
-		nowTime = SDL_GetPerformanceCounter();
-		deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
+		while (menu) {
+			lastTime = nowTime;
+			nowTime = SDL_GetPerformanceCounter();
+			deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
 
-		game.events(pause, mousePressed);
+			game.events(pause, mousePressed);
+			game.clear(0, 0, 0);
 
-		if (pause) {
-
-			deltaTime -= 0.5 * deltaTime;
-		}
-		else{
-			deltaTime += 0.1 * deltaTime;
-		}
-		
-		game.clear(0, 0, 0);
-
-		camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 10.0f);
-
-		player.inputUpdate(deltaTime);
-
-		mechs.update(player.x, player.y, player.w, player.h, camera.x, camera.y, deltaTime);
-
-		ground.update(camera.x, camera.y, deltaTime);
-
-		shootCooldown += deltaTime;
-		if (mousePressed && shootCooldown > 0.2f) {
-			bullets.spawnBullet(bulletTexture, player.x + player.w / 2, player.y + 30, 3, 20, 1000.0f, camera.x, camera.y);
-			shootCooldown = 0.0f;
-			shootTrue = true;
+			for (int i = 0; i < stars.size(); ++i) {
+				stars[i].x -= 10.0f * float(deltaTime);
+				stars[i].update(0, 0);
+				if (stars[i].x < -10) {
+					stars[i].x = winW + 10;
+				}
+				game.render(stars[i].texture, &stars[i].sRect);
+			}
 
 			int mx, my;
 			SDL_GetMouseState(&mx, &my);
-			if (mx < player.sRect.x)
-				player.flipped = true;
-			if (mx > player.sRect.x) {
-				player.flipped = false;
-			}
-		}
-		if (shootTrue) {
-			shootTextureTime += deltaTime;
-			if (shootCooldown < 0.2f && player.xS == 0.0f) {
-				player.texture = playerShoot;
+
+			if (startButton.collidePoint(mx, my)) {
+				SDL_SetTextureColorMod(startButtonTexture, 132, 132, 132);
+				if (mousePressed) {
+					menu = false;
+					playing = true;
+					mousePressed = false;
+				}
 			}
 			else {
-				shootTextureTime = 0;
-				shootTrue = false;
+				SDL_SetTextureColorMod(startButtonTexture, 255, 255, 255);
 			}
+
+			if (exitButton.collidePoint(mx, my)) {
+				SDL_SetTextureColorMod(exitButtonTexture, 132, 132, 132);
+				if (mousePressed) {
+					menu = false;
+					game.running = false;
+				}
+			}
+			else {
+				SDL_SetTextureColorMod(exitButtonTexture, 255, 255, 255);
+			}
+
+			game.render(startButton.texture, &startButton.rect);
+
+			game.render(exitButton.texture, &exitButton.rect);
+
+			game.render(moneBg.texture, &moneBg.rect);
+
+			game.present();
 		}
+
+		while (playing) {
+			lastTime = nowTime;
+			nowTime = SDL_GetPerformanceCounter();
+			deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
+
+			game.events(pause, mousePressed);
+
+			if (keys[SDL_SCANCODE_ESCAPE]) {
+				playing = false;
+				menu = true;
+			}
 		
-		Log(ground.tiles.size());
-		bullets.update(deltaTime);
+			game.clear(0, 0, 0);
 
-		for (int i = 0; i < ground.tilesOnScreen.size(); ++i) {
-			if (player.groundStop(ground.tilesOnScreen[i].wRect, -15, 0)) {
-				player.jumps = 1;
+			camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 10.0f);
+
+			player.inputUpdate(deltaTime);
+
+			mechs.update(player.x, player.y, player.w, player.h, camera.x, camera.y, deltaTime);
+
+			ground.update(camera.x, camera.y, deltaTime);
+
+			shootCooldown += deltaTime;
+			if (mousePressed && shootCooldown > 0.2f) {
+				bullets.spawnBullet(bulletTexture, player.x + player.w / 2, player.y + 30, 3, 20, 1000.0f, camera.x, camera.y);
+				shootCooldown = 0.0f;
+				shootTrue = true;
+
+				int mx, my;
+				SDL_GetMouseState(&mx, &my);
+				if (mx < player.sRect.x)
+					player.flipped = true;
+				if (mx > player.sRect.x) {
+					player.flipped = false;
+				}
 			}
-
-			for (int g = 0; g < mechs.mechsOnScreen.size(); ++g) {
-				mechs.mechsOnScreen[g].groundStop(ground.tilesOnScreen[i].wRect, 15, 5);
-			}
-
-			for (int o = 0; o < bullets.bullets.size();) {
-				if (bullets.bullets[o].collideRect(ground.tilesOnScreen[i].wRect, 0, 0)) {
-					bullets.bullets.erase(bullets.bullets.begin() + o);
+			if (shootTrue) {
+				shootTextureTime += deltaTime;
+				if (shootCooldown < 0.2f && player.xS == 0.0f) {
+					player.texture = playerShoot;
 				}
 				else {
-					++o;
+					shootTextureTime = 0;
+					shootTrue = false;
 				}
 			}
 
-			game.render(ground.tilesOnScreen[i].texture, &ground.tilesOnScreen[i].sRect);
-		}
-
-		if (fabsf(player.xS) > 0) {
-			spawnMechTime += float(deltaTime);
-			spawnMechIncreaser += float(deltaTime) / 10.0f;
-			
-			if (spawnMechTime > spawnMechRandomTime && mechs.mechs.size() < 40) {
-				
-				if (player.x < winW / 2) {
-					mechs.spawnMech(ground.recordLowX - rand() % 50 + 50, player.y);
+			for (int i = 0; i < stars.size(); ++i) {
+				stars[i].x -= 10.0f * float(deltaTime);
+				stars[i].update(0, 0);
+				if (stars[i].x < -10) {
+					stars[i].x = winW + 10;
 				}
-				if (player.x > winW / 2) {
-					mechs.spawnMech(ground.recordHighX + rand() % 50 + 50, player.y);
-				}
-				
-				spawnMechTime = 0;
-				if (spawnMechIncreaser > 4.9f) {
-					spawnMechIncreaser = 4.9f;
-				}
-				spawnMechRandomTime = (rand() % 5 + 50) / 10.0f - spawnMechIncreaser;
+				game.render(stars[i].texture, &stars[i].sRect);
 			}
-		}
+		
+			bullets.update(deltaTime);
 
-		for (int i = 0; i < mechs.mechsOnScreen.size(); ++i) {
-			if (mechs.mechsOnScreen[i].collideRect(player.wRect, -15, 0)) {
-				if (player.xC < mechs.mechsOnScreen[i].xC) {
-					mechs.mechsOnScreen[i].xS = 30;
-					healthBar.rect.w -= 20;
+			for (int i = 0; i < ground.tilesOnScreen.size(); ++i) {
+				if (player.groundStop(ground.tilesOnScreen[i].wRect, -15, 0)) {
+					player.jumps = 1;
 				}
-				else if (player.xC > mechs.mechsOnScreen[i].xC) {
-					mechs.mechsOnScreen[i].xS = -30;
-					healthBar.rect.w -= 20;
+
+				for (int g = 0; g < mechs.mechsOnScreen.size(); ++g) {
+					mechs.mechsOnScreen[g].groundStop(ground.tilesOnScreen[i].wRect, 15, 2);
 				}
-				
-			}
-			for (int o = 0; o < bullets.bullets.size();) {
-				if (bullets.bullets[o].collideRect(mechs.mechsOnScreen[i].wRect, 0, 0)) {
-					bullets.bullets.erase(bullets.bullets.begin() + o);
-					mechs.mechsOnScreen[i].health -= 1;
-					if (mechs.mechsOnScreen[i].health <= 0) {
-						score += 1;
+
+				for (int o = 0; o < bullets.bullets.size();) {
+					if (bullets.bullets[o].collideRect(ground.tilesOnScreen[i].wRect, 0, 0)) {
+						bullets.bullets.erase(bullets.bullets.begin() + o);
+					}
+					else {
+						++o;
 					}
 				}
-				else {
-					++o;
+
+				game.render(ground.tilesOnScreen[i].texture, &ground.tilesOnScreen[i].sRect);
+			}
+
+			if (fabsf(player.xS) > 0) {
+				spawnMechTime += float(deltaTime);
+				spawnMechIncreaser += float(deltaTime) / 10.0f;
+			
+				if (spawnMechTime > spawnMechRandomTime && mechs.mechs.size() < 40) {
+				
+					if (player.x < winW / 2) {
+						mechs.spawnMech(ground.recordLowX - rand() % 50 + 50, player.y);
+					}
+					if (player.x > winW / 2) {
+						mechs.spawnMech(ground.recordHighX + rand() % 50 + 50, player.y);
+					}
+				
+					spawnMechTime = 0;
+					if (spawnMechIncreaser > 4.9f) {
+						spawnMechIncreaser = 4.9f;
+					}
+					spawnMechRandomTime = (rand() % 5 + 50) / 10.0f - spawnMechIncreaser;
 				}
 			}
-			mechs.mechsOnScreen[i].rearUpdate(camera.x, camera.y);
-			game.renderFlipped(mechs.mechsOnScreen[i].texture, &mechs.mechsOnScreen[i].sRect, mechs.mechsOnScreen[i].flipped);
-		}
 
-		for (int i = 0; i < bullets.bullets.size(); ++i) {
-			bullets.bullets[i].rearUpdate(camera.x, camera.y);
-			if (bullets.bullets[i].onScreen(winW, winH, 0)) {
-				game.renderWithRotation(bullets.bullets[i].texture, &bullets.bullets[i].sRect, bullets.bullets[i].rotation);
+			for (int i = 0; i < mechs.mechsOnScreen.size(); ++i) {
+				if (mechs.mechsOnScreen[i].collideRect(player.wRect, -15, 0)) {
+					if (player.xC < mechs.mechsOnScreen[i].xC) {
+						mechs.mechsOnScreen[i].xS = 30;
+						healthBar.rect.w -= 20;
+					}
+					else if (player.xC > mechs.mechsOnScreen[i].xC) {
+						mechs.mechsOnScreen[i].xS = -30;
+						healthBar.rect.w -= 20;
+					}
+					if (healthBar.rect.w < 1) {
+						dead = true;
+						playing = false;
+					}
+				}
+				for (int o = 0; o < bullets.bullets.size();) {
+					if (bullets.bullets[o].collideRect(mechs.mechsOnScreen[i].wRect, 0, 0)) {
+						bullets.bullets.erase(bullets.bullets.begin() + o);
+						mechs.mechsOnScreen[i].health -= 1;
+						if (mechs.mechsOnScreen[i].health <= 0) {
+							score += 1;
+						}
+					}
+					else {
+						++o;
+					}
+				}
+				mechs.mechsOnScreen[i].rearUpdate(camera.x, camera.y);
+				game.renderFlipped(mechs.mechsOnScreen[i].texture, &mechs.mechsOnScreen[i].sRect, mechs.mechsOnScreen[i].flipped);
 			}
-		}
 
-		score < 10 ? SDL_SetTextureColorMod(bulletTexture, 191, 38, 38) :
-		score >= 10 && score < 20 ? SDL_SetTextureColorMod(bulletTexture, 67, 235, 52) :
-		score >= 20 && score < 30 ? SDL_SetTextureColorMod(bulletTexture, 52, 186, 235) :
-		score >= 30 && score < 40 ? SDL_SetTextureColorMod(bulletTexture, 211, 52, 235) :
-		score >= 40 && score < 50 ? SDL_SetTextureColorMod(bulletTexture, 255, 255, 255) :
-		SDL_SetTextureColorMod(bulletTexture, 227, 163, 25);
+			for (int i = 0; i < bullets.bullets.size(); ++i) {
+				bullets.bullets[i].rearUpdate(camera.x, camera.y);
+				if (bullets.bullets[i].onScreen(winW, winH, 0)) {
+					game.renderWithRotation(bullets.bullets[i].texture, &bullets.bullets[i].sRect, bullets.bullets[i].rotation);
+				}
+			}
 
-		player.rearUpdate(camera.x, camera.y);
+			score < 10 ? SDL_SetTextureColorMod(bulletTexture, 191, 38, 38) :
+			score >= 10 && score < 20 ? SDL_SetTextureColorMod(bulletTexture, 67, 235, 52) :
+			score >= 20 && score < 30 ? SDL_SetTextureColorMod(bulletTexture, 52, 186, 235) :
+			score >= 30 && score < 40 ? SDL_SetTextureColorMod(bulletTexture, 211, 52, 235) :
+			score >= 40 && score < 50 ? SDL_SetTextureColorMod(bulletTexture, 255, 255, 255) :
+			SDL_SetTextureColorMod(bulletTexture, 227, 163, 25);
+
+			player.rearUpdate(camera.x, camera.y);
 		
-		game.renderFlipped(player.texture, &player.sRect, player.flipped);
+			game.renderFlipped(player.texture, &player.sRect, player.flipped);
 
-		game.render(healthBar.texture, &healthBar.rect);
-		game.render(healthText.texture, &healthText.rect);
+			game.render(healthBar.texture, &healthBar.rect);
+			game.render(healthText.texture, &healthText.rect);
 
-		scoreText.text = "score: " + std::to_string(score);
-		scoreText.update();
-		game.render(scoreText.texture, &scoreText.rect);
+			scoreText.text = "score: " + std::to_string(score);
+			scoreText.update();
+			game.render(scoreText.texture, &scoreText.rect);
 
-		testText.text = "fps: " + std::to_string(ftint(1.0f / float(deltaTime)));
-		fpsInt += 1;
-		if (fpsInt % 5 == 0) {
-			testText.update();
+			testText.text = "fps: " + std::to_string(ftint(1.0f / float(deltaTime)));
+			fpsInt += 1;
+			if (fpsInt % 5 == 0) {
+				testText.update();
+			}
+			game.render(testText.texture, &testText.rect);
+
+			game.present();
 		}
-		game.render(testText.texture, &testText.rect);
 
-		game.present();
+		while (dead) {
+			lastTime = nowTime;
+			nowTime = SDL_GetPerformanceCounter();
+			deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
+			game.events(pause, mousePressed);
+
+			dieTextureAlpha += 1.0f + float(deltaTime) * 10000.0f;
+
+			SDL_SetTextureAlphaMod(dieTexture, dieTextureAlpha);
+			game.render(dieTexture, &dieTextureRect);
+			game.present();
+			if (dieTextureAlpha >= 20) {
+				dieTextureAlpha = 0;
+				dead = false;
+				menu = true;
+				ground.tiles.clear();
+				ground.tilesOnScreen.clear();
+				mechs.mechs.clear();
+				bullets.bullets.clear();
+				player.xC = winW / 2 - player.w / 2;
+				player.yC = winH / 2 - player.h / 2;
+				player.xS = 0;
+				player.yS = 0;
+				camera.x = 0;
+				camera.y = 0;
+				player.texture = player.idle.textureList[0];
+				healthBar.rect.w = 180;
+				player.rearUpdate(camera.x, camera.y);
+				ground.generateSpawn();
+			}
 		}
 
 	}
