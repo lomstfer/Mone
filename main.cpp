@@ -199,7 +199,7 @@ int main(int argc, char* args[])
 		
 			game.clear(0, 0, 0);
 
-			camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 10.0f);
+			camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 2.0f);
 
 			player.inputUpdate(deltaTime);
 
@@ -209,7 +209,7 @@ int main(int argc, char* args[])
 
 			shootCooldown += deltaTime;
 			if (mousePressed && shootCooldown > 0.2f) {
-				bullets.spawnBullet(bulletTexture, player.x + player.w / 2, player.y + 30, 3, 20, 1000.0f, camera.x, camera.y);
+				bullets.spawnBullet(bulletTexture, player.x + player.w / 2, player.y + 45, 3, 20, 1000.0f, camera.x, camera.y);
 				shootCooldown = 0.0f;
 				shootTrue = true;
 
@@ -223,8 +223,17 @@ int main(int argc, char* args[])
 			}
 			if (shootTrue) {
 				shootTextureTime += deltaTime;
-				if (shootCooldown < 0.2f && player.xS == 0.0f) {
-					player.texture = playerShoot;
+				if (shootCooldown < 0.7f ) {
+					if (player.xS == 0.0f) {
+						player.texture = playerShoot;
+					}
+					int mx, my;
+					SDL_GetMouseState(&mx, &my);
+					if (mx < player.sRect.x)
+						player.flipped = true;
+					if (mx > player.sRect.x) {
+						player.flipped = false;
+					}
 				}
 				else {
 					shootTextureTime = 0;
@@ -321,6 +330,12 @@ int main(int argc, char* args[])
 				if (bullets.bullets[i].onScreen(winW, winH, 0)) {
 					game.renderWithRotation(bullets.bullets[i].texture, &bullets.bullets[i].sRect, bullets.bullets[i].rotation);
 				}
+				if (bullets.bullets[i].onScreen(winW, winH, 0) == false) {
+					bullets.bullets.erase(bullets.bullets.begin() + i);
+				}
+				else {
+					++i;
+				}
 			}
 
 			score < 10 ? SDL_SetTextureColorMod(bulletTexture, 191, 38, 38) :
@@ -350,19 +365,18 @@ int main(int argc, char* args[])
 
 			game.present();
 		}
-
 		while (dead) {
 			lastTime = nowTime;
 			nowTime = SDL_GetPerformanceCounter();
 			deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
 			game.events(pause, mousePressed);
 
-			dieTextureAlpha += 1.0f + float(deltaTime) * 10000.0f;
+			dieTextureAlpha += 2.0f * float(deltaTime);
 
 			SDL_SetTextureAlphaMod(dieTexture, dieTextureAlpha);
 			game.render(dieTexture, &dieTextureRect);
 			game.present();
-			if (dieTextureAlpha >= 20) {
+			if (dieTextureAlpha >= 5) {
 				dieTextureAlpha = 0;
 				dead = false;
 				menu = true;

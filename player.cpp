@@ -12,9 +12,6 @@ Player::Player(SDL_Texture* texture, float animation_speed, std::vector<SDL_Text
 	idle = AnimatedSprite(animation_speed, idle_list);
 	running = AnimatedSprite(animation_speed, run_list);
 
-	colliderUpdater = 0;
-	time = 0;
-
 	speedLimit = 200.0f;
 }
 
@@ -64,22 +61,21 @@ void Player::inputUpdate(double deltaTime) {
 
 	if (jumps == 0) {
 		running.animationSpeed = fabsf(xS) / 100.0f;
-		idle.animationSpeed = fabsf(xS) * 100.0f;
+		idle.animationSpeed = 3.0f;
 		speedLimit = 400.0f;
 	}
 	else {
 		running.animationSpeed = fabsf(xS) / 30.0f;
+		idle.animationSpeed = 3.0f;
 		speedLimit = 200.0f;
 	}
 
 	if (xS != 0) {
 		texture = running.animate(deltaTime);
 	}
-	else if (yS < 1 || yS > 1) {
+	else {
 		texture = idle.animate(deltaTime);
 	}
-
-	colliderUpdater += float(deltaTime);
 
 	moveUpdate(deltaTime);
 }

@@ -20,9 +20,6 @@ public:
 	AnimatedSprite idle;
 	AnimatedSprite running;
 
-	double time;
-	float colliderUpdater;
-
 	class Bullet : public MovingEntity {
 	public:
 		Bullet(SDL_Texture* texture, float position_x, float position_y, float width, float height, float x_speed, float y_speed, float speed, float rotation);
