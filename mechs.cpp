@@ -40,5 +40,9 @@ void Mechs::update(float player_x, float player_y, float player_width, float pla
 }
 
 void Mechs::spawnMech(float position_x, float position_y) {
-	mechs.emplace_back(walkList[0], 10.0f, walkList, position_x, position_y, 44, 40, true, 8.0f, 150.0f);
+	int size = rand() % 3;
+	if (size == 0) {
+		size = 3;
+	}
+	mechs.emplace_back(walkList[0], 10.0f, walkList, position_x, position_y, size * 32, size * 32, true, 8.0f, 150.0f);
 }

@@ -64,12 +64,12 @@ int main(int argc, char* args[])
 #pragma endregion PLAYER
 
 #pragma region
-	SDL_Texture* mech0 = IMG_LoadTexture(game.renderer, "assets/quadleggedmechspider/walking/mech0.png");
-	SDL_Texture* mech1 = IMG_LoadTexture(game.renderer, "assets/quadleggedmechspider/walking/mech1.png");
-	SDL_Texture* mech2 = IMG_LoadTexture(game.renderer, "assets/quadleggedmechspider/walking/mech2.png");
-	SDL_Texture* mech3 = IMG_LoadTexture(game.renderer, "assets/quadleggedmechspider/walking/mech3.png");
-	SDL_Texture* mech4 = IMG_LoadTexture(game.renderer, "assets/quadleggedmechspider/walking/mech4.png");
-	SDL_Texture* mech5 = IMG_LoadTexture(game.renderer, "assets/quadleggedmechspider/walking/mech5.png");
+	SDL_Texture* mech0 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob0.png");
+	SDL_Texture* mech1 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob1.png");
+	SDL_Texture* mech2 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob2.png");
+	SDL_Texture* mech3 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob3.png");
+	SDL_Texture* mech4 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob4.png");
+	SDL_Texture* mech5 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob5.png");
 	std::vector<SDL_Texture*> mechWalkList = { mech0, mech1, mech2, mech3, mech4, mech5 };
 
 	Mechs mechs = Mechs(winW, winH, mechWalkList);
@@ -170,7 +170,7 @@ int main(int argc, char* args[])
 			}
 
 			for (int g = 0; g < mechs.mechsOnScreen.size(); ++g) {
-				mechs.mechsOnScreen[g].groundStop(ground.tilesOnScreen[i].wRect, 0, 0);
+				mechs.mechsOnScreen[g].groundStop(ground.tilesOnScreen[i].wRect, 15, 5);
 			}
 
 			for (int o = 0; o < bullets.bullets.size();) {
@@ -189,7 +189,7 @@ int main(int argc, char* args[])
 			spawnMechTime += float(deltaTime);
 			spawnMechIncreaser += float(deltaTime) / 10.0f;
 			
-			if (spawnMechTime > spawnMechRandomTime && mechs.mechs.size() < 20) {
+			if (spawnMechTime > spawnMechRandomTime && mechs.mechs.size() < 40) {
 				
 				if (player.x < winW / 2) {
 					mechs.spawnMech(ground.recordLowX - rand() % 50 + 50, player.y);
@@ -199,30 +199,23 @@ int main(int argc, char* args[])
 				}
 				
 				spawnMechTime = 0;
-				if (spawnMechIncreaser > 4.8f) {
-					spawnMechIncreaser = 4.8f;
+				if (spawnMechIncreaser > 4.9f) {
+					spawnMechIncreaser = 4.9f;
 				}
-				spawnMechRandomTime = (rand() % 10 + 50) / 10.0f - spawnMechIncreaser;
+				spawnMechRandomTime = (rand() % 5 + 50) / 10.0f - spawnMechIncreaser;
 			}
 		}
 
 		for (int i = 0; i < mechs.mechsOnScreen.size(); ++i) {
 			if (mechs.mechsOnScreen[i].collideRect(player.wRect, -15, 0)) {
-				/*if (player.xC + player.w + 14 > mechs.mechsOnScreen[i].x && player.xC - 14 < mechs.mechsOnScreen[i].x + mechs.mechsOnScreen[i].w) {
-					player.yC = mechs.mechsOnScreen[i].yC - player.h;
-					player.yS = 0.0f;
-					player.jumps = 1;
+				if (player.xC < mechs.mechsOnScreen[i].xC) {
+					mechs.mechsOnScreen[i].xS = 30;
+					healthBar.rect.w -= 20;
 				}
-				else {*/
-					if (player.xC < mechs.mechsOnScreen[i].xC) {
-						mechs.mechsOnScreen[i].xS = 30;
-						healthBar.rect.w -= 10;
-					}
-					else if (player.xC > mechs.mechsOnScreen[i].xC) {
-						mechs.mechsOnScreen[i].xS = -30;
-						healthBar.rect.w -= 10;
-					}
-				/*}*/
+				else if (player.xC > mechs.mechsOnScreen[i].xC) {
+					mechs.mechsOnScreen[i].xS = -30;
+					healthBar.rect.w -= 20;
+				}
 				
 			}
 			for (int o = 0; o < bullets.bullets.size();) {
@@ -252,7 +245,8 @@ int main(int argc, char* args[])
 		score >= 10 && score < 20 ? SDL_SetTextureColorMod(bulletTexture, 67, 235, 52) :
 		score >= 20 && score < 30 ? SDL_SetTextureColorMod(bulletTexture, 52, 186, 235) :
 		score >= 30 && score < 40 ? SDL_SetTextureColorMod(bulletTexture, 211, 52, 235) :
-		SDL_SetTextureColorMod(bulletTexture, 255, 255, 255);
+		score >= 40 && score < 50 ? SDL_SetTextureColorMod(bulletTexture, 255, 255, 255) :
+		SDL_SetTextureColorMod(bulletTexture, 227, 163, 25);
 
 		player.rearUpdate(camera.x, camera.y);
 		
@@ -267,8 +261,9 @@ int main(int argc, char* args[])
 
 		testText.text = "fps: " + std::to_string(ftint(1.0f / float(deltaTime)));
 		fpsInt += 1;
-		if (fpsInt % 5 == 0)
+		if (fpsInt % 5 == 0) {
 			testText.update();
+		}
 		game.render(testText.texture, &testText.rect);
 
 		game.present();
