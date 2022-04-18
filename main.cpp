@@ -39,6 +39,10 @@ int main(int argc, char* args[])
 	SDL_Texture* exitButtonTexture = IMG_LoadTexture(game.renderer, "assets/exitbutton.png");
 	ScreenObject exitButton = ScreenObject(exitButtonTexture, winW * 0.3927 + 21 * 7 / 2, 420, 18 * 5, 10 * 5, true);
 
+	SDL_Texture* controlsInsTexture = IMG_LoadTexture(game.renderer, "assets/controlsins.png");
+	ScreenObject controlsIns = ScreenObject(controlsInsTexture, winW - 230, 60, 33 * 6, 21 * 6, false);
+	Text controls = Text("Controls", 30, { 255, 255, 255, 255 }, "assets/orange juice.ttf", controlsIns.rect.x + controlsIns.rect.w / 2, controlsIns.rect.y - 40, true, game.renderer);
+
 	Camera camera(0.0f, 0.0f);
 
 #pragma region
@@ -185,6 +189,10 @@ int main(int argc, char* args[])
 			game.render(exitButton.texture, &exitButton.rect);
 
 			game.render(moneBg.texture, &moneBg.rect);
+
+			game.render(controlsIns.texture, &controlsIns.rect);
+
+			game.render(controls.texture, &controls.rect);
 
 			game.present();
 		}
@@ -341,8 +349,6 @@ int main(int argc, char* args[])
 					++i;
 				}
 			}
-
-			Log(ground.tiles.size());
 
 			if (score < 20) {
 				SDL_SetTextureColorMod(bulletTexture, 191, 38, 38);
