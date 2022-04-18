@@ -21,5 +21,6 @@ public:
     Text(std::string text, int size, SDL_Color color, std::string fontpath, int x, int y, bool centered, SDL_Renderer* renderer);
     void render();
     void update();
+    void updateFont(std::string fontpath);
     ~Text();
 };

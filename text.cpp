@@ -23,7 +23,6 @@ void Text::render()
 void Text::update()
 {
 	SDL_DestroyTexture(texture);
-	//font = TTF_OpenFont(fontpath.c_str(), size);
 	surface = TTF_RenderText_Solid(font, text.c_str(), color);
 	texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
@@ -33,6 +32,11 @@ void Text::update()
 	else
 		rect.x = x;
 	rect.y = y;
+}
+
+void Text::updateFont(std::string fontpath) {
+	TTF_CloseFont(font);
+	font = TTF_OpenFont(fontpath.c_str(), size);
 }
 
 Text::~Text() {
