@@ -69,7 +69,7 @@ int main(int argc, char* args[])
 
 	SDL_Texture* playerShoot = IMG_LoadTexture(game.renderer, "assets/player/AShoot.png");
 
-	Player player = Player(playerIdle0, 3.0f, playerIdleList, playerRunList, winW / 2, winH / 2, 16 * 5, 16 * 5, true, 1.0f, 0.2f, 300.0f, 200.0f, 150.0f);
+	Player player = Player(playerIdle0, 3.0f, playerIdleList, playerRunList, winW / 2, winH / 2, 16 * 5, 16 * 5, true, 1.0f, 0.2f, 400.0f, 200.0f, 150.0f);
 	Player::Bullets bullets = Player::Bullets(winW, winH);
 	SDL_Texture* bulletTexture = IMG_LoadTexture(game.renderer, "assets/squares/whitesquare.png");
 	SDL_SetTextureColorMod(bulletTexture, 191, 38, 38);
@@ -145,7 +145,6 @@ int main(int argc, char* args[])
 			lastTime = nowTime;
 			nowTime = SDL_GetPerformanceCounter();
 			deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
-
 			game.events(pause, mousePressed);
 			game.clear(0, 0, 0);
 

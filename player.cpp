@@ -35,6 +35,9 @@ void Player::inputUpdate(double deltaTime) {
 	}
 	else {
 		xS *= pow(damp, deltaTime);
+		if (fabsf(xS) < 10.0f) {
+			xS = 0.0f;
+		}
 	}
 
 	if (fabsf(xS) > speedLimit) {
@@ -46,9 +49,7 @@ void Player::inputUpdate(double deltaTime) {
 		}
 	}
 
-	if (fabsf(xS) < 5.0f) {
-		xS = 0.0f;
-	}
+	
 	if (fabsf(yS) < 1.0f && jumps > 0) {
 		yS = 0.0f;
 	}
