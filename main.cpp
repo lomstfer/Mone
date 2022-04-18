@@ -329,7 +329,7 @@ int main(int argc, char* args[])
 				game.renderFlipped(mechs.mechsOnScreen[i].texture, &mechs.mechsOnScreen[i].sRect, mechs.mechsOnScreen[i].flipped);
 			}
 
-			for (int i = 0; i < bullets.bullets.size(); ++i) {
+			for (int i = 0; i < bullets.bullets.size();) {
 				bullets.bullets[i].rearUpdate(camera.x, camera.y);
 				if (bullets.bullets[i].onScreen(winW, winH, 0)) {
 					game.renderWithRotation(bullets.bullets[i].texture, &bullets.bullets[i].sRect, bullets.bullets[i].rotation);
@@ -383,9 +383,9 @@ int main(int argc, char* args[])
 			if (score >= highScore) {
 				highScore = score;
 			}
-			highScoreText.update();
 			highScoreText.text = "highscore: " + std::to_string(highScore);
-			game.render(highScoreText.texture, &highScoreText.rect);
+			highScoreText.update();
+			//game.render(highScoreText.texture, &highScoreText.rect);
 
 			testText.text = "fps: " + std::to_string(ftint(1.0f / float(deltaTime)));
 			fpsInt += 1;
