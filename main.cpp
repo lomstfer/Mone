@@ -387,12 +387,12 @@ int main(int argc, char* args[])
 			highScoreText.update();
 			game.render(highScoreText.texture, &highScoreText.rect);
 
-			testText.text = "fps: " + std::to_string(ftint(1.0f / float(deltaTime)));
+			/*testText.text = "fps: " + std::to_string(ftint(1.0f / float(deltaTime)));
 			fpsInt += 1;
 			if (fpsInt % 5 == 0) {
 				testText.update();
 			}
-			game.render(testText.texture, &testText.rect);
+			game.render(testText.texture, &testText.rect);*/
 			game.present();
 		}
 		while (dead) {
@@ -413,6 +413,7 @@ int main(int argc, char* args[])
 				ground.tiles.clear();
 				ground.tilesOnScreen.clear();
 				mechs.mechs.clear();
+				mechs.mechsOnScreen.clear();
 				bullets.bullets.clear();
 				player.xC = winW / 2 - player.w / 2;
 				player.yC = winH / 2 - player.h / 2;
@@ -423,6 +424,12 @@ int main(int argc, char* args[])
 				player.texture = player.idle.textureList[0];
 				healthBar.rect.w = 180;
 				score = 0;
+				spawnMechTime = 0;
+				spawnMechRandomTime = rand() % 5 + 3;
+				if (spawnMechRandomTime == 0) {
+					spawnMechRandomTime = 2;
+				}
+				spawnMechIncreaser = 0;
 				ground.recordHighX = winW / 2 + ground.spawningArea / 2 * (ground.scale + ground.gap);
 				ground.makeMoreGroundRight = true;
 				ground.recordLowX = winW / 2 - ground.spawningArea / 2 * (ground.scale + ground.gap);

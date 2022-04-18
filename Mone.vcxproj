@@ -144,7 +144,6 @@
   <ItemGroup>
     <ClCompile Include="animatedSprite.cpp" />
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="collider.cpp" />
     <ClCompile Include="ftint.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="groundTile.cpp" />
@@ -162,7 +161,6 @@
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.hpp" />
     <ClInclude Include="Camera.hpp" />
-    <ClInclude Include="Collider.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Ftint.hpp" />
     <ClInclude Include="Game.hpp" />

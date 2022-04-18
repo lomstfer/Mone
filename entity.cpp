@@ -16,6 +16,7 @@ Entity::Entity(SDL_Texture* texture, float position_x, float position_y, int wid
 	wRect = XYWH(x, y, w, h);
 }
 
+// updates the world position and the position on the screen, which takes the camera's position away from it's position
 void Entity::update(float camera_x, float camera_y) {
 	wRect.x = x;
 	wRect.y = y;

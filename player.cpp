@@ -24,10 +24,6 @@ void Player::inputUpdate(double deltaTime) {
 		}
 	}
 
-	else if (keys[SDL_SCANCODE_S]) {
-		yS = float(jumpForce);
-	}
-
 	if (keys[SDL_SCANCODE_A]) {
 		xS += -float(walkForce) * float(deltaTime);
 		flipped = true;
