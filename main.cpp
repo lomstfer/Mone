@@ -378,21 +378,21 @@ int main(int argc, char* args[])
 			
 			scoreText.text = "score: " + std::to_string(score);
 			scoreText.update();
-			//game.render(scoreText.texture, &scoreText.rect);
+			game.render(scoreText.texture, &scoreText.rect);
 
 			if (score >= highScore) {
 				highScore = score;
 			}
 			highScoreText.text = "highscore: " + std::to_string(highScore);
 			highScoreText.update();
-			//game.render(highScoreText.texture, &highScoreText.rect);
+			game.render(highScoreText.texture, &highScoreText.rect);
 
 			testText.text = "fps: " + std::to_string(ftint(1.0f / float(deltaTime)));
 			fpsInt += 1;
 			if (fpsInt % 5 == 0) {
 				testText.update();
 			}
-			//game.render(testText.texture, &testText.rect);
+			game.render(testText.texture, &testText.rect);
 			game.present();
 		}
 		while (dead) {
