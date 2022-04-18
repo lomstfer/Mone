@@ -98,7 +98,7 @@ int main(int argc, char* args[])
 
 #pragma endregion QUADMECH
 
-	SDL_Texture* stoneTexture = IMG_LoadTexture(game.renderer, "assets/squares/stonesquare.png");
+	SDL_Texture* stoneTexture = IMG_LoadTexture(game.renderer, "assets/squares/monesquare.png");
 
 	Ground ground = Ground(winW, winH, stoneTexture);
 	ground.generateSpawn();
@@ -203,7 +203,7 @@ int main(int argc, char* args[])
 		
 			game.clear(0, 0, 0);
 
-			camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 10.0f);
+			camera.cameraUpdate(player.x + player.w / 2 - winW / 2.0f, player.y + player.h / 2 - winH / 2.0f, deltaTime * 2.0f);
 
 			player.inputUpdate(deltaTime);
 
@@ -281,13 +281,13 @@ int main(int argc, char* args[])
 				spawnMechTime += float(deltaTime);
 				spawnMechIncreaser += float(deltaTime) / 20.0f;
 			
-				if (spawnMechTime > spawnMechRandomTime && mechs.mechs.size() < 40) {
+				if (spawnMechTime > spawnMechRandomTime && mechs.mechs.size() < 10 + ftint(spawnMechIncreaser * 10.0f)) {
 				
 					if (player.x < winW / 2) {
-						mechs.spawnMech(ground.recordLowX /*- rand() % 50 + 50*/, player.y);
+						mechs.spawnMech(player.x - (rand() % 200 + 100 + winW / 2), player.y);
 					}
 					if (player.x > winW / 2) {
-						mechs.spawnMech(ground.recordHighX /*+ rand() % 50 + 50*/, player.y);
+						mechs.spawnMech(player.x + (rand() % 200 + 100 + winW / 2), player.y);
 					}
 				
 					spawnMechTime = 0;
@@ -374,7 +374,7 @@ int main(int argc, char* args[])
 
 			game.render(healthBar.texture, &healthBar.rect);
 
-			healthText.update();
+			healthText.render();
 			
 			scoreText.text = "score: " + std::to_string(score);
 			scoreText.update();

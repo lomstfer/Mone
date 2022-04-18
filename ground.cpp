@@ -36,26 +36,24 @@ void Ground::generateSpawn() {
 	for (int i = 0; i < spawningArea / 2 + 1; ++i) {
 		int surfaceDone = 0;
 		for (int o = 0; o < deep; ++o) {
-			/*if (surfaceDone == 0) {
-				surfaceDone = 1;
-				surfaceTilesOnScreen.emplace_back(stoneTexture, winW / 2 + i * (scale + gap), winH / 2 + o * (scale + gap), scale, scale);
-			}
-			else {*/
-				tiles.emplace_back(stoneTexture, winW / 2 + i * (scale + gap), winH / 2 + o * (scale + gap), scale, scale);
-				tiles.emplace_back(stoneTexture, winW / 2 - i * (scale + gap), winH / 2 + o * (scale + gap), scale, scale);
-			/*}*/
+			tiles.emplace_back(stoneTexture, winW / 2 + i * (scale + gap), winH / 2 + o * (scale + gap), scale, scale);
+			tiles.emplace_back(stoneTexture, winW / 2 - i * (scale + gap), winH / 2 + o * (scale + gap), scale, scale);
 		}
 	}
 }
 
 void Ground::update(float camera_x, float camera_y, double deltaTime) {
 	// Iteration: update and get the new record positions //
-	for (int i = 0; i < tiles.size(); ++i) {
+	for (int i = 0; i < tiles.size();) {
 		tiles[i].update(camera_x, camera_y);
 
 		if (tiles[i].onScreenX(winW, 100) && tiles[i].onScreen == false) {
 			tiles[i].onScreen = true;
 			tilesOnScreen.push_back(tiles[i]);
+			tiles.erase(tiles.begin() + i);
+		}
+		else {
+			++i;
 		}
 	}
 
@@ -63,15 +61,19 @@ void Ground::update(float camera_x, float camera_y, double deltaTime) {
 	for (int i = 0; i < tilesOnScreen.size();) {
 		tilesOnScreen[i].update(camera_x, camera_y);
 
-		if (tilesOnScreen[i].x < recordLowX) {
-			recordLowX = ftint(tilesOnScreen[i].x);
-			makeMoreGroundLeft = true;
+		if (tilesOnScreen[i].x >= recordHighX) {
+			recordHighX = ftint(tilesOnScreen[i].x);
+			makeMoreGroundRight = true;
+		}
+		else {
 			makeMoreGroundRight = false;
 		}
 
-		if (tilesOnScreen[i].x > recordHighX) {
-			recordHighX = ftint(tilesOnScreen[i].x);
-			makeMoreGroundRight = true;
+		if (tilesOnScreen[i].x <= recordLowX) {
+			recordLowX = ftint(tilesOnScreen[i].x);
+			makeMoreGroundLeft = true;
+		}
+		else {
 			makeMoreGroundLeft = false;
 		}
 
