@@ -20,6 +20,6 @@ public:
 	void renderWithRotation(SDL_Texture* texture, SDL_Rect* rect, float angle);
 	void renderFlipped(SDL_Texture* texture, SDL_Rect* rect, bool flip);
 
-	void events(bool &pause, bool &mouse_pressed);
+	void events(bool& mouse_pressed, int& mouse_x, int& mouse_y);
 	void quit();
 };

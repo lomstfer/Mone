@@ -8,6 +8,7 @@ Game::Game(const char* title, int width, int height) {
 	TTF_Init();
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_FULLSCREEN_DESKTOP);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	SDL_RenderSetLogicalSize(renderer, width, height);
 	SDL_Surface* icon = IMG_Load("assets/player/idle/Aidle0.png");
 	SDL_SetWindowIcon(window, icon);
 	running = true;
@@ -39,15 +40,15 @@ void Game::renderFlipped(SDL_Texture* texture, SDL_Rect* rect, bool flip) {
 	}
 }
 
-void Game::events(bool &pause, bool &mouse_pressed) {
+void Game::events(bool &mouse_pressed, int &mouse_x, int &mouse_y) {
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT) {
 			running = false;
 		}
-		if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_SPACE) {
-			pause = !pause;
-			break;
-		}
+
+		mouse_x = event.motion.x;
+		mouse_y = event.motion.y;
+
 		if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
 			mouse_pressed = true;
 		}

@@ -130,6 +130,8 @@ int main(int argc, char* args[])
 
 	bool pause = false;
 
+	int mX;
+	int mY;
 	bool mousePressed = false;
 	float shootCooldown = 0;
 	float reloadTime = 1.0f;
@@ -145,7 +147,7 @@ int main(int argc, char* args[])
 			lastTime = nowTime;
 			nowTime = SDL_GetPerformanceCounter();
 			deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
-			game.events(pause, mousePressed);
+			game.events(mousePressed, mX, mY);
 			game.clear(0, 0, 0);
 
 			for (int i = 0; i < stars.size(); ++i) {
@@ -157,10 +159,7 @@ int main(int argc, char* args[])
 				game.render(stars[i].texture, &stars[i].sRect);
 			}
 
-			int mx, my;
-			SDL_GetMouseState(&mx, &my);
-
-			if (startButton.collidePoint(mx, my)) {
+			if (startButton.collidePoint(mX, mY)) {
 				SDL_SetTextureColorMod(startButtonTexture, 132, 132, 132);
 				if (mousePressed) {
 					menu = false;
@@ -172,7 +171,7 @@ int main(int argc, char* args[])
 				SDL_SetTextureColorMod(startButtonTexture, 255, 255, 255);
 			}
 
-			if (exitButton.collidePoint(mx, my)) {
+			if (exitButton.collidePoint(mX, mY)) {
 				SDL_SetTextureColorMod(exitButtonTexture, 132, 132, 132);
 				if (mousePressed) {
 					menu = false;
@@ -201,7 +200,7 @@ int main(int argc, char* args[])
 			nowTime = SDL_GetPerformanceCounter();
 			deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
 
-			game.events(pause, mousePressed);
+			game.events(mousePressed, mX, mY);
 
 			if (keys[SDL_SCANCODE_ESCAPE]) {
 				playing = false;
@@ -233,11 +232,9 @@ int main(int argc, char* args[])
 				shootCooldown = 0.0f;
 				shootTrue = true;
 
-				int mx, my;
-				SDL_GetMouseState(&mx, &my);
-				if (mx < player.sRect.x)
+				if (mX < player.sRect.x)
 					player.flipped = true;
-				if (mx > player.sRect.x) {
+				if (mX > player.sRect.x) {
 					player.flipped = false;
 				}
 			}
@@ -247,11 +244,9 @@ int main(int argc, char* args[])
 					if (player.xS == 0.0f) {
 						player.texture = playerShoot;
 					}
-					int mx, my;
-					SDL_GetMouseState(&mx, &my);
-					if (mx < player.sRect.x)
+					if (mX < player.sRect.x)
 						player.flipped = true;
-					if (mx > player.sRect.x) {
+					if (mX > player.sRect.x) {
 						player.flipped = false;
 					}
 				}
@@ -404,7 +399,7 @@ int main(int argc, char* args[])
 			lastTime = nowTime;
 			nowTime = SDL_GetPerformanceCounter();
 			deltaTime = double((nowTime - lastTime) / double(SDL_GetPerformanceFrequency()));
-			game.events(pause, mousePressed);
+			game.events(mousePressed, mX, mY);
 
 			dieTextureAlpha += 2.0f * float(deltaTime);
 
