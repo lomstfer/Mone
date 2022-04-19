@@ -36,7 +36,7 @@ public:
 		int winW;
 		int winH;
 
-		void spawnBullet(SDL_Texture* texture, float position_x, float position_y, float width, float height, float speed, float camera_x, float camera_y);
+		void spawnBullet(SDL_Texture* texture, float position_x, float position_y, float width, float height, float speed, float camera_x, float camera_y, int mouse_x, int mouse_y);
 	};
 
 

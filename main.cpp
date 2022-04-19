@@ -228,7 +228,7 @@ int main(int argc, char* args[])
 
 			shootCooldown += deltaTime;
 			if (mousePressed && shootCooldown > 1.0f) {
-				bullets.spawnBullet(bulletTexture, player.x + player.w / 2, player.y + 45, 3, 20, 1000.0f, camera.x, camera.y);
+				bullets.spawnBullet(bulletTexture, player.x + player.w / 2, player.y + 45, 3, 20, 1000.0f, camera.x, camera.y, mX, mY);
 				shootCooldown = 0.0f;
 				shootTrue = true;
 

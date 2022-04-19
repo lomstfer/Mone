@@ -96,17 +96,12 @@ void Player::Bullets::update(float camera_x, float camera_y, double deltaTime) {
 	}
 }
 
-void Player::Bullets::spawnBullet(SDL_Texture* texture, float position_x, float position_y, float width, float height, float speed, float camera_x, float camera_y) {
+void Player::Bullets::spawnBullet(SDL_Texture* texture, float position_x, float position_y, float width, float height, float speed, float camera_x, float camera_y, int mouse_x, int mouse_y) {
 	float xS;
 	float yS;
 
-	int mX;
-	int mY;
-
-	SDL_GetMouseState(&mX, &mY);
-
-	float dX = float(mX) + camera_x - position_x;
-	float dY = float(mY) + camera_y - position_y;
+	float dX = float(mouse_x) + camera_x - position_x;
+	float dY = float(mouse_y) + camera_y - position_y;
 
 	float hyp = sqrt(pow(dX, 2) + pow(dY, 2));
 
