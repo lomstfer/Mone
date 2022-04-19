@@ -147,10 +147,10 @@
     <ClCompile Include="ground.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="entity.cpp" />
-    <ClCompile Include="mechs.cpp" />
+    <ClCompile Include="enemies.cpp" />
     <ClCompile Include="movingEntity.cpp" />
     <ClCompile Include="player.cpp" />
-    <ClCompile Include="quadmech.cpp" />
+    <ClCompile Include="enemy.cpp" />
     <ClCompile Include="screenObject.cpp" />
     <ClCompile Include="text.cpp" />
     <ClCompile Include="xywh.cpp" />
@@ -163,11 +163,11 @@
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GroundTile.hpp" />
     <ClInclude Include="Ground.hpp" />
-    <ClInclude Include="Mechs.hpp" />
+    <ClInclude Include="Enemies.hpp" />
     <ClInclude Include="MovingEntity.hpp" />
     <ClInclude Include="Player.hpp" />
-    <ClInclude Include="QuadMech.hpp" />
-    <ClInclude Include="ScreenObject.h" />
+    <ClInclude Include="Enemy.hpp" />
+    <ClInclude Include="ScreenObject.hpp" />
     <ClInclude Include="Text.hpp" />
     <ClInclude Include="XYWH.h" />
   </ItemGroup>

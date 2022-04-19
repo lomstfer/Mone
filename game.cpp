@@ -32,10 +32,10 @@ void Game::renderWithRotation(SDL_Texture* texture, SDL_Rect* rect, float angle)
 }
 
 void Game::renderFlipped(SDL_Texture* texture, SDL_Rect* rect, bool flip) {
-	if (flip) {
+	if (flip == true) {
 		SDL_RenderCopyEx(renderer, texture, NULL, rect, NULL, NULL, SDL_FLIP_HORIZONTAL);
 	}
-	else {
+	if (flip == false) {
 		SDL_RenderCopyEx(renderer, texture, NULL, rect, NULL, NULL, SDL_FLIP_NONE);
 	}
 }

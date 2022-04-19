@@ -45,13 +45,13 @@
     <ClCompile Include="xywh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="quadmech.cpp">
+    <ClCompile Include="enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ground.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mechs.cpp">
+    <ClCompile Include="enemies.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="text.cpp">
@@ -89,19 +89,19 @@
     <ClInclude Include="XYWH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QuadMech.hpp">
+    <ClInclude Include="Enemy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Ground.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mechs.hpp">
+    <ClInclude Include="Enemies.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Text.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ScreenObject.h">
+    <ClInclude Include="ScreenObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
