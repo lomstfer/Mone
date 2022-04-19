@@ -1,7 +1,7 @@
-#include "QuadMech.hpp"
+#include "Enemy.hpp"
 #include <stdlib.h>
 
-QuadMech::QuadMech(SDL_Texture* texture, float animation_speed, std::vector<SDL_Texture*> walk_list, float position_x, float position_y, int width, int height, bool centered, float speed, float gravity)
+Enemy::Enemy(SDL_Texture* texture, float animation_speed, std::vector<SDL_Texture*> walk_list, float position_x, float position_y, int width, int height, bool centered, float speed, float gravity)
 				 : MovingEntity(texture, position_x, position_y, width, height, centered, 0.0f, 0.0f, speed),
 				   gravity(gravity)
 {
@@ -21,7 +21,7 @@ QuadMech::QuadMech(SDL_Texture* texture, float animation_speed, std::vector<SDL_
 	health = 3;
 }
 
-void QuadMech::patrolUpdate(double deltaTime, float player_x, float player_y, float player_width, float player_height) {
+void Enemy::patrolUpdate(double deltaTime, float player_x, float player_y, float player_width, float player_height) {
 	texture = walk.animate(deltaTime);
 
 	yS += gravity * float(deltaTime);

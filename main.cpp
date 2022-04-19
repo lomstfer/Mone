@@ -9,11 +9,11 @@
 #include "GroundTile.hpp"
 #include "Camera.hpp"
 #include "AnimatedSprite.hpp"
-#include "QuadMech.hpp"
+#include "Enemy.hpp"
 #include "Ground.hpp"
-#include "Mechs.hpp"
+#include "Enemies.hpp"
 #include "Text.hpp"
-#include "ScreenObject.h"
+#include "ScreenObject.hpp"
 
 #define Log(x) std::cout << x << std::endl;
 
@@ -45,7 +45,7 @@ int main(int argc, char* args[])
 
 	Camera camera(0.0f, 0.0f);
 
-#pragma region
+	// PLayer
 	SDL_Texture* playerIdle0 = IMG_LoadTexture(game.renderer, "assets/player/idle/Aidle0.png");
 	SDL_Texture* playerIdle1 = IMG_LoadTexture(game.renderer, "assets/player/idle/Aidle1.png");
 	SDL_Texture* playerIdle2 = IMG_LoadTexture(game.renderer, "assets/player/idle/Aidle2.png");
@@ -80,27 +80,24 @@ int main(int argc, char* args[])
 
 	Text healthText = Text("HEALTH: ", 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", healthBar.rect.x - 180, healthBar.rect.y + 3, false, game.renderer);
 
-#pragma endregion PLAYER
 
-#pragma region
-	SDL_Texture* mech0 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob0.png");
-	SDL_Texture* mech1 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob1.png");
-	SDL_Texture* mech2 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob2.png");
-	SDL_Texture* mech3 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob3.png");
-	SDL_Texture* mech4 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob4.png");
-	SDL_Texture* mech5 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob5.png");
-	std::vector<SDL_Texture*> mechWalkList = { mech0, mech1, mech2, mech3, mech4, mech5 };
+	// Enemies
+	SDL_Texture* enemy0 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob0.png");
+	SDL_Texture* enemy1 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob1.png");
+	SDL_Texture* enemy2 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob2.png");
+	SDL_Texture* enemy3 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob3.png");
+	SDL_Texture* enemy4 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob4.png");
+	SDL_Texture* enemy5 = IMG_LoadTexture(game.renderer, "assets/rockblob/rockblob5.png");
+	std::vector<SDL_Texture*> enemyWalkList = { enemy0, enemy1, enemy2, enemy3, enemy4, enemy5 };
 
-	Mechs mechs = Mechs(winW, winH, mechWalkList);
+	Enemies enemies = Enemies(winW, winH, enemyWalkList);
 
-	float spawnMechTime = 0;
-	float spawnMechRandomTime = rand() % 5 + 3;
-	if (spawnMechRandomTime == 0) {
-		spawnMechRandomTime = 2;
+	float spawnEnemyTime = 0;
+	float spawnEnemyRandomTime = rand() % 5 + 3;
+	if (spawnEnemyRandomTime == 0) {
+		spawnEnemyRandomTime = 2;
 	}
-	float spawnMechIncreaser = 0;
-
-#pragma endregion QUADMECH
+	float spawnEnemyIncreaser = 0;
 
 	SDL_Texture* stoneTexture = IMG_LoadTexture(game.renderer, "assets/squares/monesquare.png");
 
@@ -115,8 +112,6 @@ int main(int argc, char* args[])
 
 	int score = 0;
 	Text scoreText("score: " + std::to_string(score), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 10, false, game.renderer);
-	Text testText("fps: " + std::to_string(score), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 300, false, game.renderer);
-	int fpsInt = 0;
 
 	int highScore = score;
 	Text highScoreText = Text("highscore: " + std::to_string(highScore), 50, { 255, 255, 255, 255 }, "assets/orange juice.ttf", 10, 50, false, game.renderer);
@@ -142,7 +137,10 @@ int main(int argc, char* args[])
 	bool playing = false;
 	bool dead = false;
 
+	// Game Loop
 	while (game.running) {
+
+		// Menu Loop
 		while (menu) {
 			lastTime = nowTime;
 			nowTime = SDL_GetPerformanceCounter();
@@ -195,6 +193,7 @@ int main(int argc, char* args[])
 			game.present();
 		}
 
+		// Playing Loop
 		while (playing) {
 			lastTime = nowTime;
 			nowTime = SDL_GetPerformanceCounter();
@@ -213,7 +212,7 @@ int main(int argc, char* args[])
 
 			player.inputUpdate(deltaTime);
 
-			mechs.update(player.x, player.y, player.w, player.h, camera.x, camera.y, deltaTime);
+			enemies.update(player.x, player.y, player.w, player.h, camera.x, camera.y, deltaTime);
 
 			ground.update(camera.x, camera.y, deltaTime);
 
@@ -231,22 +230,16 @@ int main(int argc, char* args[])
 				bullets.spawnBullet(bulletTexture, player.x + player.w / 2, player.y + 45, 3, 20, 1000.0f, camera.x, camera.y, mX, mY);
 				shootCooldown = 0.0f;
 				shootTrue = true;
-
-				if (mX < player.sRect.x)
-					player.flipped = true;
-				if (mX > player.sRect.x) {
-					player.flipped = false;
-				}
 			}
 			if (shootTrue) {
 				shootTextureTime += deltaTime;
-				if (shootCooldown < 0.7f ) {
+				if (shootTextureTime < 0.7f) {
 					if (player.xS == 0.0f) {
 						player.texture = playerShoot;
 					}
-					if (mX < player.sRect.x)
+					if (mX <= player.sRect.x + player.w / 2)
 						player.flipped = true;
-					if (mX > player.sRect.x) {
+					if (mX > player.sRect.x + player.w / 2) {
 						player.flipped = false;
 					}
 				}
@@ -263,8 +256,8 @@ int main(int argc, char* args[])
 					player.jumps = 1;
 				}
 
-				for (int g = 0; g < mechs.mechsOnScreen.size(); ++g) {
-					mechs.mechsOnScreen[g].groundStop(ground.tilesOnScreen[i].wRect, 15, 2);
+				for (int g = 0; g < enemies.enemiesOnScreen.size(); ++g) {
+					enemies.enemiesOnScreen[g].groundStop(ground.tilesOnScreen[i].wRect, 15, 2);
 				}
 
 				for (int o = 0; o < bullets.bullets.size();) {
@@ -280,34 +273,34 @@ int main(int argc, char* args[])
 			}
 
 			if (fabsf(player.xS) > 0) {
-				spawnMechTime += float(deltaTime);
-				spawnMechIncreaser += float(deltaTime) / 20.0f;
+				spawnEnemyTime += float(deltaTime);
+				spawnEnemyIncreaser += float(deltaTime) / 20.0f;
 			
-				if (spawnMechTime > spawnMechRandomTime && mechs.mechs.size() < 10 + ftint(spawnMechIncreaser * 10.0f)) {
+				if (spawnEnemyTime > spawnEnemyRandomTime && enemies.enemies.size() < 10 + ftint(spawnEnemyIncreaser * 10.0f)) {
 				
 					if (player.x < winW / 2) {
-						mechs.spawnMech(player.x - (rand() % 200 + 100 + winW / 2), player.y);
+						enemies.spawnEnemy(player.x - (rand() % 200 + 100 + winW / 2), player.y);
 					}
 					if (player.x > winW / 2) {
-						mechs.spawnMech(player.x + (rand() % 200 + 100 + winW / 2), player.y);
+						enemies.spawnEnemy(player.x + (rand() % 200 + 100 + winW / 2), player.y);
 					}
 				
-					spawnMechTime = 0;
-					if (spawnMechIncreaser > 4.9f) {
-						spawnMechIncreaser = 4.9f;
+					spawnEnemyTime = 0;
+					if (spawnEnemyIncreaser > 4.9f) {
+						spawnEnemyIncreaser = 4.9f;
 					}
-					spawnMechRandomTime = (rand() % 5 + 50) / 10.0f - spawnMechIncreaser;
+					spawnEnemyRandomTime = (rand() % 5 + 50) / 10.0f - spawnEnemyIncreaser;
 				}
 			}
 
-			for (int i = 0; i < mechs.mechsOnScreen.size(); ++i) {
-				if (mechs.mechsOnScreen[i].collideRect(player.wRect, -15, 0)) {
-					if (player.xC < mechs.mechsOnScreen[i].xC) {
-						mechs.mechsOnScreen[i].xS = 30;
+			for (int i = 0; i < enemies.enemiesOnScreen.size(); ++i) {
+				if (enemies.enemiesOnScreen[i].collideRect(player.wRect, -15, 0)) {
+					if (player.xC < enemies.enemiesOnScreen[i].xC) {
+						enemies.enemiesOnScreen[i].xS = 30;
 						healthBar.rect.w -= 20;
 					}
-					else if (player.xC > mechs.mechsOnScreen[i].xC) {
-						mechs.mechsOnScreen[i].xS = -30;
+					else if (player.xC > enemies.enemiesOnScreen[i].xC) {
+						enemies.enemiesOnScreen[i].xS = -30;
 						healthBar.rect.w -= 20;
 					}
 					if (healthBar.rect.w < 1) {
@@ -316,10 +309,10 @@ int main(int argc, char* args[])
 					}
 				}
 				for (int o = 0; o < bullets.bullets.size();) {
-					if (bullets.bullets[o].collideRect(mechs.mechsOnScreen[i].wRect, 0, 0)) {
+					if (bullets.bullets[o].collideRect(enemies.enemiesOnScreen[i].wRect, 0, 0)) {
 						bullets.bullets.erase(bullets.bullets.begin() + o);
-						mechs.mechsOnScreen[i].health -= 1;
-						if (mechs.mechsOnScreen[i].health <= 0) {
+						enemies.enemiesOnScreen[i].health -= 1;
+						if (enemies.enemiesOnScreen[i].health <= 0) {
 							score += 1;
 						}
 					}
@@ -327,8 +320,8 @@ int main(int argc, char* args[])
 						++o;
 					}
 				}
-				mechs.mechsOnScreen[i].rearUpdate(camera.x, camera.y);
-				game.renderFlipped(mechs.mechsOnScreen[i].texture, &mechs.mechsOnScreen[i].sRect, mechs.mechsOnScreen[i].flipped);
+				enemies.enemiesOnScreen[i].rearUpdate(camera.x, camera.y);
+				game.renderFlipped(enemies.enemiesOnScreen[i].texture, &enemies.enemiesOnScreen[i].sRect, enemies.enemiesOnScreen[i].flipped);
 			}
 
 			for (int i = 0; i < bullets.bullets.size();) {
@@ -369,7 +362,7 @@ int main(int argc, char* args[])
 			}
 
 			player.rearUpdate(camera.x, camera.y);
-		
+
 			game.renderFlipped(player.texture, &player.sRect, player.flipped);
 
 			game.render(healthBar.texture, &healthBar.rect);
@@ -387,14 +380,10 @@ int main(int argc, char* args[])
 			highScoreText.update();
 			game.render(highScoreText.texture, &highScoreText.rect);
 
-			/*testText.text = "fps: " + std::to_string(ftint(1.0f / float(deltaTime)));
-			fpsInt += 1;
-			if (fpsInt % 5 == 0) {
-				testText.update();
-			}
-			game.render(testText.texture, &testText.rect);*/
 			game.present();
 		}
+
+		// Dead Loop
 		while (dead) {
 			lastTime = nowTime;
 			nowTime = SDL_GetPerformanceCounter();
@@ -412,8 +401,8 @@ int main(int argc, char* args[])
 				menu = true;
 				ground.tiles.clear();
 				ground.tilesOnScreen.clear();
-				mechs.mechs.clear();
-				mechs.mechsOnScreen.clear();
+				enemies.enemies.clear();
+				enemies.enemiesOnScreen.clear();
 				bullets.bullets.clear();
 				player.xC = winW / 2 - player.w / 2;
 				player.yC = winH / 2 - player.h / 2;
@@ -424,12 +413,12 @@ int main(int argc, char* args[])
 				player.texture = player.idle.textureList[0];
 				healthBar.rect.w = 180;
 				score = 0;
-				spawnMechTime = 0;
-				spawnMechRandomTime = rand() % 5 + 3;
-				if (spawnMechRandomTime == 0) {
-					spawnMechRandomTime = 2;
+				spawnEnemyTime = 0;
+				spawnEnemyRandomTime = rand() % 5 + 3;
+				if (spawnEnemyRandomTime == 0) {
+					spawnEnemyRandomTime = 2;
 				}
-				spawnMechIncreaser = 0;
+				spawnEnemyIncreaser = 0;
 				ground.recordHighX = winW / 2 + ground.spawningArea / 2 * (ground.scale + ground.gap);
 				ground.makeMoreGroundRight = true;
 				ground.recordLowX = winW / 2 - ground.spawningArea / 2 * (ground.scale + ground.gap);

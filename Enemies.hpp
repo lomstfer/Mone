@@ -1,13 +1,13 @@
 #include <SDL.h>
-#include "QuadMech.hpp"
+#include "Enemy.hpp"
 #include <vector>
 
-class Mechs {
+class Enemies {
 public:
-	Mechs(int window_width, int window_height, std::vector<SDL_Texture*> walk_list);
+	Enemies(int window_width, int window_height, std::vector<SDL_Texture*> walk_list);
 
-	std::vector<QuadMech> mechs;
-	std::vector<QuadMech> mechsOnScreen;
+	std::vector<Enemy> enemies;
+	std::vector<Enemy> enemiesOnScreen;
 
 	std::vector<SDL_Texture*> walkList;
 
@@ -15,5 +15,5 @@ public:
 	int winH;
 
 	void update(float player_x, float player_y, float player_width, float player_height, float camera_x, float camera_y, double deltaTime);
-	void spawnMech(float position_x, float position_y);
+	void spawnEnemy(float position_x, float position_y);
 };

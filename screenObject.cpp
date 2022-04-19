@@ -1,4 +1,4 @@
-#include "ScreenObject.h"
+#include "ScreenObject.hpp"
 
 ScreenObject::ScreenObject(SDL_Texture* texture, int position_x, int position_y, int width, int height, bool centered)
 			: texture(texture) {
