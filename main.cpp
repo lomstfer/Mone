@@ -22,7 +22,7 @@ int main(int argc, char* args[])
 	int winW = 1920;
 	int winH = 1080;
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
-	Game game = Game("Illre", winW, winH);
+	Game game = Game("Mone", winW, winH);
 
 	SDL_Texture* starTexture = IMG_LoadTexture(game.renderer, "assets/squares/whitesquare.png");
 	std::vector<Entity> stars;

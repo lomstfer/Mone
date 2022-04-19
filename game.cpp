@@ -8,6 +8,8 @@ Game::Game(const char* title, int width, int height) {
 	TTF_Init();
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_FULLSCREEN_DESKTOP);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	SDL_Surface* icon = IMG_Load("assets/player/idle/Aidle0.png");
+	SDL_SetWindowIcon(window, icon);
 	running = true;
 }
 
