@@ -230,16 +230,18 @@ int main(int argc, char* args[])
 				bullets.spawnBullet(bulletTexture, player.x + player.w / 2, player.y + 45, 3, 20, 1000.0f, camera.x, camera.y, mX, mY);
 				shootCooldown = 0.0f;
 				shootTrue = true;
+				
 			}
 			if (shootTrue) {
 				shootTextureTime += deltaTime;
-				if (shootTextureTime < 0.7f) {
+				if (shootTextureTime < 0.1f) {
 					if (player.xS == 0.0f) {
 						player.texture = playerShoot;
 					}
 					if (mX <= player.sRect.x + player.w / 2)
 						player.flipped = true;
 					if (mX > player.sRect.x + player.w / 2) {
+						// unknown bug, when you press W and A and shoot right the player flips a number of times, I do not know why
 						player.flipped = false;
 					}
 				}

@@ -49,7 +49,6 @@ void Player::inputUpdate(double deltaTime) {
 		}
 	}
 
-	
 	if (fabsf(yS) < 1.0f && jumps > 0) {
 		yS = 0.0f;
 	}
